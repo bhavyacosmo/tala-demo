@@ -33,6 +33,17 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', updatePricingDisplay);
     updatePricingDisplay(); // Initial call
   }
+
+  // --- Mobile Menu Toggle
+  const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+  const navLinks = document.querySelector('.nav-links');
+
+  if (mobileMenuBtn) {
+    mobileMenuBtn.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+      mobileMenuBtn.classList.toggle('active');
+    });
+  }
 });
 
 
