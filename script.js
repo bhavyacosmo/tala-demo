@@ -2,6 +2,40 @@
 // TĀLA EDUCATION — PD Page Redesign — Script
 // ============================================================
 
+// --- Pricing Tabs (Mobile)
+document.addEventListener('DOMContentLoaded', () => {
+  const tabs = document.querySelectorAll('.pricing-tab');
+  const cards = document.querySelectorAll('.p-card');
+
+  const updatePricingDisplay = () => {
+    const isMobile = window.innerWidth <= 1024;
+    const activeTab = document.querySelector('.pricing-tab.active');
+    const targetId = activeTab ? activeTab.getAttribute('data-target') : 'card-reserve';
+
+    cards.forEach(card => {
+      if (isMobile) {
+        card.style.display = card.id === targetId ? 'flex' : 'none';
+      } else {
+        card.style.display = 'flex';
+      }
+    });
+  };
+
+  if (tabs.length > 0) {
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        updatePricingDisplay();
+      });
+    });
+
+    window.addEventListener('resize', updatePricingDisplay);
+    updatePricingDisplay(); // Initial call
+  }
+});
+
+
 // --- Smooth scroll for all anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   anchor.addEventListener('click', function (e) {

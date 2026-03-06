@@ -185,7 +185,7 @@ a {
 /* ============================================================
    NAV
    ============================================================ */
-   /*
+/*
 .nav-header {
     position: fixed;
     top: 0;
@@ -202,13 +202,13 @@ a {
     margin: 0 auto;
     padding: 0 40px;
     /* Reduced to provide "little spacing" but keep items near edges */
- /*   height: 80px;
+/*   height: 80px;
     /* Increased from 68px */
- /*   display: flex;
+/*   display: flex;
     align-items: center;
     justify-content: space-between;
     /* Ensures logo left, links right */
-    /*
+/*
 }
 
 
@@ -261,130 +261,130 @@ a {
 NAVBAR
 ================================ */
 
-.nav-header{
-width:100%;
-background:#f5f6f8;
-border-bottom:1px solid #e6e8eb;
+.nav-header {
+    width: 100%;
+    background: #f5f6f8;
+    border-bottom: 1px solid #e6e8eb;
 }
 
-.nav-inner{
-width:100%;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:16px 20px;
+.nav-inner {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
 }
 
 /* Logo */
 
-.nav-logo-img{
-height:40px;
-display:block;
+.nav-logo-img {
+    height: 40px;
+    display: block;
 }
 
 /* Navigation links */
 
-.nav-links{
-display:flex;
-align-items:center;
-gap:34px;
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 34px;
 }
 
-.nav-links a{
-text-decoration:none;
-font-size:16px;
-color:#3c4455;
-font-weight:500;
-transition:0.2s;
+.nav-links a {
+    text-decoration: none;
+    font-size: 16px;
+    color: #3c4455;
+    font-weight: 500;
+    transition: 0.2s;
 }
 
 /* Active link */
 
-.nav-links a.active{
-color:#2f6edb;
+.nav-links a.active {
+    color: #2f6edb;
 }
 
 /* ================================
 SIGNUP BUTTON
 ================================ */
 
-.nav-cta{
-background:#2a7de1;
-color:white !important;
-padding:12px 26px;
-border-radius:30px;
-font-weight:600;
-transition:0.3s;
+.nav-cta {
+    background: #2a7de1;
+    color: white !important;
+    padding: 12px 26px;
+    border-radius: 30px;
+    font-weight: 600;
+    transition: 0.3s;
 }
 
-.nav-cta:hover{
-background:#1f63b5;
+.nav-cta:hover {
+    background: #1f63b5;
 }
 
 /* ================================
 DROPDOWN
 ================================ */
 
-.nav-item{
-position:relative;
+.nav-item {
+    position: relative;
 }
 
-.dropdown-arrow{
-font-size:12px;
-margin-left:6px;
+.dropdown-arrow {
+    font-size: 12px;
+    margin-left: 6px;
 }
 
 /* dropdown menu */
 
-.dropdown-menu{
-position:absolute;
-top:40px;
-left:0;
-background:white;
-border-radius:8px;
-box-shadow:0 10px 25px rgba(0,0,0,0.08);
-padding:10px 0;
-min-width:180px;
-display:none;
-flex-direction:column;
-z-index:100;
+.dropdown-menu {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    padding: 10px 0;
+    min-width: 180px;
+    display: none;
+    flex-direction: column;
+    z-index: 100;
 }
 
-.dropdown-menu a{
-padding:10px 16px;
-font-size:14px;
-color:#3c4455;
-display:block;
+.dropdown-menu a {
+    padding: 10px 16px;
+    font-size: 14px;
+    color: #3c4455;
+    display: block;
 }
 
-.dropdown-menu a:hover{
-background:#f5f6f8;
+.dropdown-menu a:hover {
+    background: #f5f6f8;
 }
 
 /* show dropdown */
 
-.dropdown:hover .dropdown-menu{
-display:flex;
+.dropdown:hover .dropdown-menu {
+    display: flex;
 }
 
 /* ================================
 RESPONSIVE
 ================================ */
 
-@media (max-width:768px){
+@media (max-width:768px) {
 
-.nav-inner{
-padding:16px 20px;
-}
+    .nav-inner {
+        padding: 16px 20px;
+    }
 
-.nav-links{
-gap:20px;
-}
+    .nav-links {
+        gap: 20px;
+    }
 
-.nav-cta{
-padding:10px 20px;
-font-size:14px;
-}
+    .nav-cta {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
 
 }
 
@@ -2163,101 +2163,6 @@ font-size:14px;
     padding: 0 2rem;
 }
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
-@media (max-width: 1024px) {
-    .three-col {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .sessions-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .testimonials-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .workshop-intro-grid {
-        grid-template-columns: 1fr;
-        gap: 3rem;
-    }
-
-    .facilitator-grid {
-        grid-template-columns: 260px 1fr;
-        gap: 3rem;
-    }
-
-    .includes-inner {
-        grid-template-columns: 1fr;
-        gap: 3rem;
-    }
-
-    .steps-row {
-        grid-template-columns: 1fr;
-        gap: 3rem;
-    }
-
-    .step-line {
-        display: none;
-    }
-}
-
-@media (max-width: 768px) {
-    .section {
-        padding: 4rem 0;
-    }
-
-    .nav-links {
-        display: none;
-    }
-
-    .hero-content {
-        padding: 4rem 2rem 4rem;
-    }
-
-    .hero-content h1 {
-        font-size: 2.25rem;
-    }
-
-    .two-col,
-    .three-col {
-        grid-template-columns: 1fr;
-    }
-
-    .testimonials-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .pricing-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .facilitator-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .footer-inner {
-        grid-template-columns: 1fr;
-        gap: 2.5rem;
-    }
-
-    .facilitator-img-placeholder {
-        max-width: 260px;
-        margin: 0 auto;
-    }
-
-    .sessions-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-@media (max-width: 480px) {
-    .sessions-grid {
-        grid-template-columns: 1fr;
-    }
-}
 
 /* ============================================================
    SCROLL ANIMATIONS
@@ -2393,9 +2298,41 @@ textarea {
     background: #f4b400;
     border: none;
     padding: 12px;
-    font-weight: bold;
-    border-radius: 25px;
+    box-shadow: var(--shadow-sm);
+}
+
+/* ============================================================
+
+/* ============================================================
+   PRICING TABS (Mobile Only)
+   ============================================================ */
+.pricing-tabs {
+    display: none;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    padding: 0 1rem;
+}
+
+.pricing-tab {
+    flex: 1;
+    padding: 0.75rem 0.5rem;
+    border: 1px solid #e2e8f0;
+    background: var(--white);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--mid);
     cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.pricing-tab.active {
+    background: var(--tala-blue);
+    color: var(--white);
+    border-color: var(--tala-blue);
+    box-shadow: var(--shadow-sm);
 }
 
 /* Floating Call Button */
@@ -2429,6 +2366,156 @@ textarea {
     fill: currentColor;
 }
 
+/* ============================================================
+   GLOBAL RESPONSIVENESS
+   ============================================================ */
+@media (max-width: 1024px) {
+    .container {
+        padding: 0 1.5rem;
+    }
+
+    .pricing-grid-3 {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .pricing-tabs {
+        display: flex;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .p-card {
+        display: none;
+        /* Hidden by default on mobile, shown via active class */
+    }
+
+    .cards-grid.three-col {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .sessions-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .testimonials-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+    .section {
+        padding: 4rem 0;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+
+    .hero h1 {
+        font-size: 3rem;
+    }
+
+    .hero p {
+        font-size: 1.1rem;
+    }
+
+    .cards-grid.three-col,
+    .cards-grid.two-col {
+        grid-template-columns: 1fr;
+    }
+
+    .testimonials-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sessions-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .workshop-intro-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .facilitator-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .facilitator-credits {
+        justify-content: center;
+    }
+
+    .includes-inner {
+        flex-direction: column;
+        gap: 3rem;
+    }
+
+    .steps-row {
+        flex-direction: column;
+        gap: 4rem;
+    }
+
+    .step-line {
+        display: none;
+    }
+
+    .nav-links {
+        display: none;
+        /* Simplified for now, could add a burger menu if needed */
+    }
+
+    .nav-inner {
+        justify-content: center;
+    }
+
+    .hero-content {
+        margin-left: 0;
+        text-align: center;
+        padding: 0 1rem;
+    }
+
+    .hero-points {
+        align-items: center;
+    }
+}
+
+/* Mobile Phones */
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 2.25rem;
+    }
+
+    .section-title {
+        font-size: 1.75rem;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .pricing-tab {
+        font-size: 0.75rem;
+        padding: 0.6rem 0.25rem;
+    }
+
+    .floating-call-btn {
+        bottom: 20px;
+        right: 20px;
+        left: auto;
+    }
+
+    .sessions-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 @keyframes floatIn {
     from {
         opacity: 0;
@@ -2438,19 +2525,5 @@ textarea {
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
-    }
-}
-
-@media (max-width: 768px) {
-    .floating-call-btn {
-        bottom: 20px;
-        left: 20px;
-        width: 50px;
-        height: 50px;
-    }
-
-    .floating-call-btn svg {
-        width: 24px;
-        height: 24px;
     }
 }
