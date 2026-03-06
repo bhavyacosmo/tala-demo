@@ -452,9 +452,11 @@ RESPONSIVE
 .hero-content {
     position: relative;
     z-index: 2;
-    padding: 6rem 4rem;
+    padding: 3rem 0 4rem 2rem;
+    /* Reduced top padding, moved left */
     width: 100%;
-    max-width: 1200px;
+    max-width: 1300px;
+    /* Increased max-width to allow more room on left */
     margin: 0 auto;
     color: var(--white);
     animation: heroFadeInUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
@@ -474,34 +476,38 @@ RESPONSIVE
 
 .hero-title {
     font-family: var(--font-display);
-    font-size: 4rem;
+    font-size: 4.8rem;
+    /* Increased size */
     font-weight: 900;
-    line-height: 1.1;
+    line-height: 1.05;
     margin-bottom: 1.5rem;
-    max-width: 800px;
+    max-width: 900px;
 }
 
 .hero-subtitle {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
+    font-size: 1.4rem;
+    /* Increased size */
+    margin-bottom: 2.5rem;
     opacity: 0.95;
-    max-width: 650px;
+    max-width: 750px;
     line-height: 1.6;
 }
 
 .hero-features {
     display: flex;
-    gap: 2rem;
-    margin-bottom: 2.5rem;
-    flex-wrap: wrap;
+    flex-direction: column;
+    /* Stacked points */
+    gap: 1.25rem;
+    margin-bottom: 3rem;
 }
 
 .hero-feature {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 1.25rem;
+    /* Increased size */
 }
 
 .hero-feature svg {
