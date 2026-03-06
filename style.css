@@ -506,11 +506,6 @@ RESPONSIVE
     font-weight: 900;
     margin-right: 0.25rem;
 }
-
-*/
-
-
-
 * {
     margin: 0;
     padding: 0;
@@ -557,11 +552,11 @@ RESPONSIVE
     max-width: 1000px;
     margin-left: 8%;
     /* Reverted to previous left-aligned position */
-    margin-top: 100px;
-    /* Space for navbar */
-    opacity: 0;
-    text-align: left;
-    /* Explicitly left-aligned */
+margin-top: 100px;
+/* Space for navbar */
+opacity: 0;
+text-align: left;
+/* Explicitly left-aligned */
 }
 
 .hero-content.fade-in-up {
@@ -1145,7 +1140,8 @@ RESPONSIVE
 .step-item p {
     font-size: 0.95rem;
     color: var(--mid);
-    max-width: 220px;
+    max-width: 100%;
+    /* Fix: Allow full width on mobile */
     margin: 0 auto;
 }
 
@@ -2448,12 +2444,18 @@ textarea {
 
     /* Navbar Responsiveness */
     .nav-inner {
-        padding: 1rem 1.5rem;
-        justify-content: space-between;
+        padding: 1rem 1.5rem !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+    }
+
+    .nav-logo {
+        margin: 0 !important;
     }
 
     .mobile-menu-btn {
-        display: flex;
+        display: flex !important;
     }
 
     .nav-links {
@@ -2470,12 +2472,12 @@ textarea {
         padding: 2rem;
         box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
         z-index: 1000;
-        display: flex;
-        /* Override any previous none */
+        display: flex !important;
+        transition: right 0.3s ease;
     }
 
     .nav-links.active {
-        right: 0;
+        right: 0 !important;
     }
 
     .nav-cta {
