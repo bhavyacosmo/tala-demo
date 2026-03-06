@@ -185,6 +185,7 @@ a {
 /* ============================================================
    NAV
    ============================================================ */
+   /*
 .nav-header {
     position: fixed;
     top: 0;
@@ -201,12 +202,13 @@ a {
     margin: 0 auto;
     padding: 0 40px;
     /* Reduced to provide "little spacing" but keep items near edges */
-    height: 80px;
+ /*   height: 80px;
     /* Increased from 68px */
-    display: flex;
+ /*   display: flex;
     align-items: center;
     justify-content: space-between;
     /* Ensures logo left, links right */
+    /*
 }
 
 
@@ -253,6 +255,139 @@ a {
 .nav-cta:hover {
     background: var(--tala-blue-dk) !important;
 }
+*/
+
+/* ================================
+NAVBAR
+================================ */
+
+.nav-header{
+width:100%;
+background:#f5f6f8;
+border-bottom:1px solid #e6e8eb;
+}
+
+.nav-inner{
+width:100%;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:16px 20px;
+}
+
+/* Logo */
+
+.nav-logo-img{
+height:40px;
+display:block;
+}
+
+/* Navigation links */
+
+.nav-links{
+display:flex;
+align-items:center;
+gap:34px;
+}
+
+.nav-links a{
+text-decoration:none;
+font-size:16px;
+color:#3c4455;
+font-weight:500;
+transition:0.2s;
+}
+
+/* Active link */
+
+.nav-links a.active{
+color:#2f6edb;
+}
+
+/* ================================
+SIGNUP BUTTON
+================================ */
+
+.nav-cta{
+background:#2a7de1;
+color:white !important;
+padding:12px 26px;
+border-radius:30px;
+font-weight:600;
+transition:0.3s;
+}
+
+.nav-cta:hover{
+background:#1f63b5;
+}
+
+/* ================================
+DROPDOWN
+================================ */
+
+.nav-item{
+position:relative;
+}
+
+.dropdown-arrow{
+font-size:12px;
+margin-left:6px;
+}
+
+/* dropdown menu */
+
+.dropdown-menu{
+position:absolute;
+top:40px;
+left:0;
+background:white;
+border-radius:8px;
+box-shadow:0 10px 25px rgba(0,0,0,0.08);
+padding:10px 0;
+min-width:180px;
+display:none;
+flex-direction:column;
+z-index:100;
+}
+
+.dropdown-menu a{
+padding:10px 16px;
+font-size:14px;
+color:#3c4455;
+display:block;
+}
+
+.dropdown-menu a:hover{
+background:#f5f6f8;
+}
+
+/* show dropdown */
+
+.dropdown:hover .dropdown-menu{
+display:flex;
+}
+
+/* ================================
+RESPONSIVE
+================================ */
+
+@media (max-width:768px){
+
+.nav-inner{
+padding:16px 20px;
+}
+
+.nav-links{
+gap:20px;
+}
+
+.nav-cta{
+padding:10px 20px;
+font-size:14px;
+}
+
+}
+
 
 /* ============================================================
    HERO — Ken Burns zoom + full-viewport behind fixed nav
