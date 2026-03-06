@@ -410,7 +410,6 @@ RESPONSIVE
 /* ============================================================
    HERO — Ken Burns zoom + full-viewport behind fixed nav
    ============================================================ */
-/*
 @keyframes kenBurns {
     0% {
         transform: scale(1);
@@ -423,10 +422,11 @@ RESPONSIVE
 
 .hero {
     position: relative;
-    min-height: 100vh;
+    min-height: 85vh;
     display: flex;
     align-items: center;
     overflow: hidden;
+    background: #000;
 }
 
 .hero-bg {
@@ -439,25 +439,25 @@ RESPONSIVE
     transform-origin: center center;
     animation: kenBurns 14s ease-out forwards;
     will-change: transform;
+    opacity: 0.8;
 }
 
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to right, rgba(16, 12, 42, 0.65) 0%, rgba(30, 20, 60, 0.35) 45%, rgba(0, 0, 0, 0) 100%);
+    background: linear-gradient(to right, rgba(16, 12, 42, 0.75) 0%, rgba(30, 20, 60, 0.45) 45%, rgba(0, 0, 0, 0) 100%);
+    z-index: 1;
 }
 
 .hero-content {
     position: relative;
     z-index: 2;
-    padding: 8rem 2rem 4rem 4rem;
-    /* Specific request: space from left border */
-/*  width: 100%;
-    max-width: 1080px;
+    padding: 6rem 4rem;
+    width: 100%;
+    max-width: 1200px;
     margin: 0 auto;
     color: var(--white);
     animation: heroFadeInUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-    opacity: 0;
 }
 
 @keyframes heroFadeInUp {
@@ -472,113 +472,53 @@ RESPONSIVE
     }
 }
 
-.hero-content h1 {
+.hero-title {
     font-family: var(--font-display);
-    /* Much larger size matching original site */
-/*   font-size: 4.5rem;
+    font-size: 4rem;
     font-weight: 900;
     line-height: 1.1;
     margin-bottom: 1.5rem;
+    max-width: 800px;
 }
 
-.hero-content p {
-    font-size: 1.3rem;
+.hero-subtitle {
+    font-size: 1.2rem;
     margin-bottom: 2rem;
     opacity: 0.95;
     max-width: 650px;
     line-height: 1.6;
 }
 
-.hero-check-list {
-    list-style: none;
+.hero-features {
+    display: flex;
+    gap: 2rem;
     margin-bottom: 2.5rem;
+    flex-wrap: wrap;
 }
 
-.hero-check-list li {
-    padding: 0.45rem 0;
+.hero-feature {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     font-weight: 600;
-    font-size: 1.15rem;
+    font-size: 1rem;
 }
 
-.hero-check-list li::before {
-    content: '✓ ';
+.hero-feature svg {
     color: var(--tala-cyan);
-    font-weight: 900;
-    margin-right: 0.25rem;
 }
+
+.hero-btn-main {
+    padding: 1rem 3rem !important;
+    font-size: 1rem !important;
+}
+
 .hero-btn:hover {
     background: var(--tala-blue-dk);
     transform: translateY(-3px);
     box-shadow: 0 12px 32px rgba(26, 115, 232, 0.5);
 }
 
-.hero-content h1 {
-    font-size: 72px;
-    font-weight: 800;
-    line-height: 1.05;
-    margin-bottom: 25px;
-    color: var(--white);
-}
-
-
-.hero p {
-    font-size: 22px;
-    max-width: 700px;
-    line-height: 1.6;
-    color: #e6e6e6;
-    margin-bottom: 28px;
-}
-
-.hero-points {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    margin-bottom: 35px;
-}
-
-.hero-points span {
-    font-size: 18px;
-    color: var(--white);
-    /* Changed to white as requested */
-}
-
-
-.hero button {
-    background: #1fa5c6;
-    border: none;
-    padding: 16px 38px;
-    border-radius: 30px;
-    color: white;
-    font-weight: 700;
-    font-size: 16px;
-    cursor: pointer;
-    transition: .3s;
-}
-
-.hero button:hover {
-    background: #168eab;
-}
-
-@media(max-width:900px) {
-
-    .hero {
-        height: auto;
-        padding: 100px 20px;
-    }
-
-    .hero-content {
-        margin-left: 0;
-    }
-
-    .hero h1 {
-        font-size: 42px;
-    }
-
-    .hero p {
-        font-size: 18px;
-    }
-
-}
 
 /* ============================================================
    PAIN POINTS SECTION
@@ -2350,11 +2290,11 @@ textarea {
         font-size: 2rem;
     }
 
-    .hero h1 {
+    .hero-title {
         font-size: 3rem;
     }
 
-    .hero p {
+    .hero-subtitle {
         font-size: 1.1rem;
     }
 
@@ -2480,12 +2420,22 @@ textarea {
 
 /* Mobile Phones */
 @media (max-width: 480px) {
-    .hero h1 {
-        font-size: 2.25rem;
+    .hero-title {
+        font-size: 2.75rem;
     }
 
-    .section-title {
-        font-size: 1.75rem;
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .hero-content {
+        padding: 6rem 1.5rem;
+        text-align: center;
+    }
+
+    .hero-features {
+        justify-content: center;
+        gap: 1rem;
     }
 
     .btn {
