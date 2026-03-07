@@ -70,25 +70,22 @@ window.addEventListener('scroll', () => {
   }
 });
 
-// --- Intersection Observer for fade-in animations
+// --- Intersection Observer for reveal animations
 const observerOptions = {
-  threshold: 0.12,
-  rootMargin: '0px 0px -40px 0px'
+  threshold: 0.1,
+  rootMargin: '0px 0px -50px 0px'
 };
 
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
+      entry.target.classList.add('active');
       observer.unobserve(entry.target);
     }
   });
 }, observerOptions);
 
-document.querySelectorAll(
-  '.card, .testimonial-card, .session-card, .include-item, .step-item, .faq-item, .feature-list li, .pricing-card, .section-tag, .section-title, .section-subtitle, .facilitator-grid'
-).forEach(el => {
-  el.classList.add('fade-in-up');
+document.querySelectorAll('.reveal').forEach(el => {
   observer.observe(el);
 });
 
@@ -102,40 +99,44 @@ if (videoPlaceholder) {
   });
 }
 
-// ---- Scroll-triggered counter for the 1700+ banner
-function animateCounter(el, target, duration) {
-  let start = 0;
-  const step = target / (duration / 16);
-  const timer = setInterval(() => {
-    start += step;
-    if (start >= target) { start = target; clearInterval(timer); }
-    el.textContent = Math.floor(start) + '+';
-  }, 16);
-}
-
-const proofNumber = document.querySelector('.proof-number');
-if (proofNumber) {
-  const counterObs = new IntersectionObserver((entries) => {
-    if (entries[0].isIntersecting) {
-      animateCounter(proofNumber, 1700, 2000);
-      counterObs.unobserve(proofNumber);
+// ---- Scroll-triggered counter for Stats
+function animateCounter(el, target, duration = 2000) {
+  let startTimestamp = null;
+  const step = (timestamp) => {
+    if (!startTimestamp) startTimestamp = timestamp;
+    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+    const easedProgress = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+    const currentCount = Math.floor(easedProgress * target);
+    el.textContent = currentCount.toLocaleString() + '+';
+    if (progress < 1) {
+      window.requestAnimationFrame(step);
+    } else {
+      el.textContent = target.toLocaleString() + '+';
     }
-  }, { threshold: 0.5 });
-  counterObs.observe(proofNumber);
+  };
+  window.requestAnimationFrame(step);
 }
 
-// --- Horizontal Scroll Logic for Testimonials & Sessions
-function scrollTestimonials(direction) {
-  const grid = document.getElementById('testimonials-grid');
-  if (grid) {
-    const scrollAmount = 300 * direction;
-    grid.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-  }
+const counterStats = document.querySelectorAll('.counter-stat');
+if (counterStats.length > 0) {
+  const counterObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const target = parseInt(entry.target.getAttribute('data-target'));
+        animateCounter(entry.target, target, 2000);
+        counterObs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  counterStats.forEach(stat => counterObs.observe(stat));
 }
-function scrollSessions(direction) {
-  const grid = document.getElementById('sessions-grid');
+
+// --- Horizontal Scroll Logic for Testimonials
+function scrollTestimonials(direction) {
+  const grid = document.querySelector('.testimonials-grid');
   if (grid) {
-    const scrollAmount = 300 * direction;
+    const scrollAmount = 400 * direction;
     grid.scrollBy({ left: scrollAmount, behavior: 'smooth' });
   }
 }
@@ -256,13 +257,7 @@ if (cardIndividual) {
     updateIndividual();
   });
 
-  accOptions.forEach(opt => opt.onclick = () => {
-    accOptions.forEach(o => o.classList.remove('active'));
-    opt.classList.add('active');
-    opt.querySelector('input').checked = true;
-    state.accType = opt.getAttribute('data-type');
-    updateIndividual();
-  });
+  updateIndividual();
 }
 
 
@@ -357,6 +352,8 @@ if (cardGroup) {
     btn.closest('.city-toggle').setAttribute('data-city', groupState.city);
     updateGroup();
   });
+
+  updateGroup();
 }
 
 
@@ -444,51 +441,42 @@ registerForm.addEventListener('submit', async (e) => {
       modal.style.display = "none";
       document.body.style.overflow = "auto";
 
-      // 3. Load Paytm JS Checkout Script dynamically 
-      // USING STAGING SCRIPT AS REQUIRED BY THE EMAIL
-      const scriptPath = `https://securegw-stage.paytm.in/merchantpgpui/checkoutjs/merchants/${data.mid}.js`;
+      // Redirect to Paytm Standard Checkout Page
+      const paytmUrl = `https://${data.environment}/theia/api/v1/showPaymentPage?mid=${data.mid}&orderId=${data.orderId}`;
 
-      const script = document.createElement('script');
-      script.type = 'application/javascript';
-      script.src = scriptPath;
-      script.crossOrigin = "anonymous";
+      // Create a hidden form to submit the request
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = paytmUrl;
 
-      script.onload = () => {
-        // 4. Initialize Paytm Checkout JS
-        var config = {
-          "root": "", // Leave blank for PayTM's default overlay
-          "flow": "DEFAULT",
-          "data": {
-            "orderId": data.orderId,
-            "token": data.txnToken,
-            "tokenType": "TXN_TOKEN",
-            "amount": data.amount
-          },
-          "handler": {
-            "notifyMerchant": function (eventName, data) {
-              console.log("notifyMerchant handler function called");
-              console.log("eventName => ", eventName);
-              console.log("data => ", data);
-            }
-          }
-        };
+      // Add the txnToken as a hidden input
+      const txnTokenInput = document.createElement('input');
+      txnTokenInput.type = 'hidden';
+      txnTokenInput.name = 'txnToken';
+      txnTokenInput.value = data.txnToken;
+      form.appendChild(txnTokenInput);
 
-        if (window.Paytm && window.Paytm.CheckoutJS) {
-          window.Paytm.CheckoutJS.init(config).then(function onSuccess() {
-            // after successfully updating configuration, invoke JS Checkout
-            window.Paytm.CheckoutJS.invoke();
-          }).catch(function onError(error) {
-            console.log("error => ", error);
-            alert("Error initializing payment. Please try again.");
-          });
-        }
-      };
+      // Add the mid as a hidden input
+      const midInput = document.createElement('input');
+      midInput.type = 'hidden';
+      midInput.name = 'mid';
+      midInput.value = data.mid;
+      form.appendChild(midInput);
 
-      document.body.appendChild(script);
+      // Add the orderId as a hidden input
+      const orderIdInput = document.createElement('input');
+      orderIdInput.type = 'hidden';
+      orderIdInput.name = 'orderId';
+      orderIdInput.value = data.orderId;
+      form.appendChild(orderIdInput);
+
+      document.body.appendChild(form);
+      form.submit();
 
     } else {
-      console.error(data);
-      alert("Payment initiation failed. Please try again.");
+      console.error("Payment Error Details:", data);
+      const errorMsg = data.details?.body?.resultInfo?.resultMsg || "Payment initiation failed.";
+      alert("Error: " + errorMsg + "\n\nPlease check the terminal for more details.");
       submitBtn.textContent = 'Submit';
       submitBtn.disabled = false;
     }

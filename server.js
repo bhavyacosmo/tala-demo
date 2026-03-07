@@ -37,24 +37,28 @@ app.post('/paytm/initiate', async (req, res) => {
             return res.status(400).json({ error: "Missing required fields (amount, customerId)" });
         }
 
-        const orderId = 'ORDER_' + new Date().getTime();
+        const orderId = 'ORD' + new Date().getTime();
 
         const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
+        const paytmParams = {};
 
         paytmParams.body = {
             "requestType": "Payment",
             "mid": PAYTM_MID,
             "websiteName": PAYTM_WEBSITE,
             "orderId": orderId,
-            "callbackUrl": `${BASE_URL}/paytm/callback`,
+            "callbackUrl": `https://talaeducation.com/paytm-callback`,
 
             "txnAmount": {
-                "value": parseFloat(amount).toFixed(2),
+                "value": amount.toString() + ".00",
                 "currency": "INR",
             },
             "userInfo": {
-                "custId": customerId.toString().substring(0, 50),
+                "custId": customerId.toString().replace(/[^a-zA-Z0-9]/g, '').substring(0, 50),
+                "mobile": customerPhone ? customerPhone.replace(/[^0-9]/g, '').substring(0, 10) : undefined,
+                "email": customerEmail || undefined
             },
+            "channelId": "WEB"
         };
 
 
