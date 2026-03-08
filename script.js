@@ -143,258 +143,229 @@ function scrollTestimonials(direction) {
 
 
 
-// --- 1. Pricing Configuration ---
-const PRICES = {
-  RESERVE: 999,
-  INDIVIDUAL: {
-    'Bangalore': { 'Non-Residential': 15999, 'Residential': 18999 },
-    'Pune': { 'Non-Residential': 15999 }
+// --- 1. Custom Pricing Variables & Logic ---
+
+const PRICING_DATA = {
+  'Bangalore': { 'Non-Residential': 15999, 'Residential': 18999 },
+  'Pune': { 'Non-Residential': 15999 }
+};
+
+const GROUP_PRICES = {
+  'Bangalore': {
+    'Non-Residential': { 'up-to-4': 15999, '5-teachers': 15199, '6-plus': 14879 },
+    'Residential': { 'up-to-4': 18999, '5-teachers': 18049, '6-plus': 17669 }
   },
-  GROUP: {
-    'Bangalore': {
-      'Non-Residential': { 'up-to-4': 15999, '5-teachers': 15199, '6-plus': 14879 },
-      'Residential': { 'up-to-4': 18999, '5-teachers': 18049, '6-plus': 17669 }
-    },
-    'Pune': {
-      'Non-Residential': { 'up-to-4': 15999, '5-teachers': 15199, '6-plus': 14879 }
-    }
+  'Pune': {
+    'Non-Residential': { 'up-to-4': 15999, '5-teachers': 15199, '6-plus': 14879 }
   }
 };
 
+/* ── Mobile: Tab Switcher ── */
+const TABS = ['reserve', 'flexible', 'group'];
+const ACTIVE_CLS = ['active-reserve', 'active-flexible', 'active-group'];
 
-let currentOrderData = {
-  amount: 0,
-  type: 'reserve'
+window.switchTab = function (tab) {
+  TABS.forEach((id, i) => {
+    const btn = document.getElementById('m-tab-' + id);
+    const panel = document.getElementById('m-panel-' + id);
+    const on = id === tab;
+    if (btn) btn.className = 'tab-btn' + (on ? ' ' + ACTIVE_CLS[i] : '');
+    if (panel) {
+      panel.classList.toggle('hidden', !on);
+      if (on) { panel.style.animation = 'none'; panel.offsetHeight; panel.style.animation = ''; }
+    }
+  });
 };
 
-// --- 2. Interactive Pricing Logic ---
+/* ── Card 1: Reserve Now Logic ── */
+window.qty = { d: 1, m: 1 };
+window.changeQty = function (p, delta) {
+  window.qty[p] = Math.max(1, Math.min(10, window.qty[p] + delta));
+  const qtyNum = document.getElementById(p + '-qtyNum');
+  const qtyTotal = document.getElementById(p + '-qtyTotal');
+  if (qtyNum) qtyNum.textContent = window.qty[p];
+  if (qtyTotal) qtyTotal.textContent = '₹' + (window.qty[p] * 999).toLocaleString();
+};
 
-// --- Card 1: Reserve Logic ---
-const cardReserve = document.getElementById('card-reserve');
-if (cardReserve) {
-  const qtyInput = cardReserve.querySelector('.qty-input');
-  const totalPriceEl = cardReserve.querySelector('.total-price');
-  const update = () => {
-    const qty = parseInt(qtyInput.value) || 1;
-    totalPriceEl.textContent = `₹${(qty * PRICES.RESERVE).toLocaleString()}`;
-  };
+window.reserveNow = function (p) {
+  currentOrderData.amount = window.qty[p] * 999;
+  window.openRegisterModal();
+};
 
-  cardReserve.querySelector('.qty-btn.plus').onclick = () => {
-    let qty = parseInt(qtyInput.value);
-    if (qty < 10) {
-      qtyInput.value = qty + 1;
-      update();
+/* ── Card 2: Individual Teacher Logic ── */
+window.switchCity = function (p, cityShort) {
+  const panels = { blr: p + '-flex-blr', pun: p + '-flex-pun' };
+  const btns = { blr: p + '-btn-blr', pun: p + '-btn-pun' };
+
+  Object.keys(panels).forEach(key => {
+    const panel = document.getElementById(panels[key]);
+    const btn = document.getElementById(btns[key]);
+    if (panel) panel.classList.toggle('hidden', key !== cityShort);
+    if (btn) btn.classList.toggle('active', key === cityShort);
+  });
+};
+
+window.selectPlan = function (containerId, activeBtn) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const buttons = container.querySelectorAll('.plan-btn');
+  buttons.forEach(btn => btn.classList.remove('active'));
+  activeBtn.classList.add('active');
+
+  const parts = containerId.split('-'); // e.g., "d-plan-blr"
+  const prefix = parts[0];
+  const cityShort = parts[2];
+  updateFlexiblePrices(prefix, cityShort, activeBtn.textContent);
+};
+
+function updateFlexiblePrices(prefix, cityShort, planText) {
+  const months = planText === 'Full Pay' ? 1 : parseInt(planText);
+  const cityFull = cityShort === 'blr' ? 'Bangalore' : 'Pune';
+  const cityData = PRICING_DATA[cityFull];
+
+  const nrPriceEl = document.getElementById(prefix + '-price-' + cityShort + '-nonres');
+  if (nrPriceEl) {
+    const amt = Math.ceil(cityData['Non-Residential'] / months);
+    nrPriceEl.textContent = '₹' + amt.toLocaleString();
+  }
+
+  if (cityData['Residential']) {
+    const rPriceEl = document.getElementById(prefix + '-price-' + cityShort + '-res');
+    if (rPriceEl) {
+      const amt = Math.ceil(cityData['Residential'] / months);
+      rPriceEl.textContent = '₹' + amt.toLocaleString();
     }
-  };
-  cardReserve.querySelector('.qty-btn.minus').onclick = () => {
-    let qty = parseInt(qtyInput.value);
-    if (qty > 1) {
-      qtyInput.value = qty - 1;
-      update();
-    }
-  };
+  }
 }
 
-// --- Card 2: Individual Logic ---
-const cardIndividual = document.getElementById('card-individual');
-if (cardIndividual) {
-  const cityBtns = cardIndividual.querySelectorAll('.city-btn');
+/* ── Card 3: School / Group Logic ── */
+window.gState = {
+  d: { city: 'Bangalore', acc: 'Non-Residential', qty: 6 },
+  m: { city: 'Bangalore', acc: 'Non-Residential', qty: 6 }
+};
 
-  const planPills = cardIndividual.querySelectorAll('.plan-pill');
-  const accOptions = cardIndividual.querySelectorAll('.radio-label');
-  const emiAlert = cardIndividual.querySelector('.emi-only-alert');
+window.switchGroupCity = function (p, cityShort) {
+  const cityFull = cityShort === 'blr' ? 'Bangalore' : 'Pune';
+  window.gState[p].city = cityFull;
 
-  let state = { city: 'Bangalore', months: 1, accType: 'Non-Residential' };
+  const blrPanel = document.getElementById(p + '-g-blr');
+  const punPanel = document.getElementById(p + '-g-pun');
+  if (blrPanel) blrPanel.classList.toggle('hidden', cityShort !== 'blr');
+  if (punPanel) punPanel.classList.toggle('hidden', cityShort !== 'pun');
 
-  const updateIndividual = () => {
-    const cityData = PRICES.INDIVIDUAL[state.city];
+  const blrBtn = document.getElementById(p + '-g-btn-blr');
+  const punBtn = document.getElementById(p + '-g-btn-pun');
+  if (blrBtn) blrBtn.classList.toggle('active', cityShort === 'blr');
+  if (punBtn) punBtn.classList.toggle('active', cityShort === 'pun');
 
-    // Hide/Show Residential option for Pune
-    const resOption = cardIndividual.querySelector('[data-type="Residential"]');
-    if (state.city === 'Pune') {
-      resOption.style.display = 'none';
-      if (state.accType === 'Residential') {
-        state.accType = 'Non-Residential';
-        accOptions.forEach(opt => opt.classList.remove('active'));
-        cardIndividual.querySelector('[data-type="Non-Residential"]').classList.add('active');
-      }
-    } else {
-      resOption.style.display = 'flex';
-    }
+  if (cityFull === 'Pune' && window.gState[p].acc === 'Residential') {
+    window.gState[p].acc = 'Non-Residential';
+  }
+  window.refreshGroup(p, cityShort);
+};
 
-    const baseRate = cityData[state.accType];
-    const monthly = Math.ceil(baseRate / state.months);
+window.toggleGroupAccom = function (p) {
+  const cityFull = window.gState[p].city;
+  if (cityFull === 'Pune') return;
 
-    // Update prices for all options in the card based on EMI selection
-    accOptions.forEach(opt => {
-      const type = opt.getAttribute('data-type');
-      const priceDisp = opt.querySelector('.acc-price-display');
-      if (cityData[type]) {
-        const rate = cityData[type];
-        const mon = Math.ceil(rate / state.months);
-        priceDisp.textContent = `₹${mon.toLocaleString()}${state.months > 1 ? '/mo' : ''}`;
-      }
-    });
+  window.gState[p].acc = (window.gState[p].acc === 'Non-Residential') ? 'Residential' : 'Non-Residential';
+  const cityShort = cityFull === 'Bangalore' ? 'blr' : 'pun';
+  window.refreshGroup(p, cityShort);
+};
 
-    emiAlert.style.display = 'block'; // Always show as per user request
-  };
+window.changeGroup = function (p, delta) {
+  window.gState[p].qty = Math.max(6, Math.min(10, window.gState[p].qty + delta));
 
+  // Use gCount for Bangalore, pCount for Pune
+  const cityFull = window.gState[p].city;
+  const isPune = cityFull === 'Pune';
+  const qtyElId = isPune ? p + '-pCount' : p + '-gCount';
 
-  cityBtns.forEach(btn => btn.onclick = () => {
-    cityBtns.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    state.city = btn.getAttribute('data-city');
-    btn.closest('.city-toggle').setAttribute('data-city', state.city);
-    updateIndividual();
-  });
+  const qtyEl = document.getElementById(qtyElId);
+  if (qtyEl) qtyEl.textContent = window.gState[p].qty;
 
+  const cityShort = isPune ? 'pun' : 'blr';
+  window.refreshGroup(p, cityShort);
+};
 
+window.refreshGroup = function (p, cityShort) {
+  const cityFull = window.gState[p].city;
+  const acc = window.gState[p].acc;
+  const qtyVal = window.gState[p].qty;
+  const data = GROUP_PRICES[cityFull][acc];
 
-  planPills.forEach(pill => pill.onclick = () => {
-    planPills.forEach(p => p.classList.remove('active'));
-    pill.classList.add('active');
-    state.months = parseInt(pill.getAttribute('data-months'));
-    updateIndividual();
-  });
+  const labelEl = document.getElementById(p + '-g-accom-title');
+  if (labelEl) labelEl.textContent = (acc === 'Non-Residential' ? 'NON-RES' : 'RES');
 
-  updateIndividual();
-}
+  const nrCols = document.querySelectorAll('.' + p + '-g-col-nonres');
+  const rCols = document.querySelectorAll('.' + p + '-g-col-res');
+  nrCols.forEach(c => c.classList.toggle('hidden', acc !== 'Non-Residential'));
+  rCols.forEach(c => c.classList.toggle('hidden', acc !== 'Residential'));
 
+  // Highlight active tier and update 6+ prices
+  const basePrice = (acc === 'Non-Residential' ? 15999 : 18999);
+  const headPrice = data['6-plus'];
+  const totalSave = (basePrice - headPrice) * qtyVal;
 
-// --- Card 3: Group Logic ---
-const cardGroup = document.getElementById('card-group');
-if (cardGroup) {
-  const cityBtns = cardGroup.querySelectorAll('.city-btn');
-  const accPills = cardGroup.querySelectorAll('.acc-pill');
-  const tiers = cardGroup.querySelectorAll('.p-table-row');
-  const qtyInput = cardGroup.querySelector('.qty-input');
+  if (cityShort === 'blr') {
+    const hEl = document.getElementById(p + (acc === 'Non-Residential' ? '-gHeadNonRes' : '-gHeadRes'));
+    const sEl = document.getElementById(p + (acc === 'Non-Residential' ? '-gSaveNonRes' : '-gSaveRes'));
+    if (hEl) hEl.innerHTML = `₹${headPrice.toLocaleString()}<small>/head</small>`;
+    if (sEl) sEl.textContent = `You save ₹${totalSave.toLocaleString()}`;
+  }
+};
 
-  let groupState = { city: 'Bangalore', acc: 'Non-Residential', qty: 6 };
-
-  const updateGroup = () => {
-    const cityData = PRICES.GROUP[groupState.city];
-
-    // Manage Residential pill visibility
-    const resPill = document.getElementById('group-res-pill');
-    if (groupState.city === 'Pune') {
-      resPill.style.display = 'none';
-      if (groupState.acc === 'Residential') {
-        groupState.acc = 'Non-Residential';
-        accPills.forEach(p => p.classList.remove('active'));
-        cardGroup.querySelector('[data-acc="Non-Residential"]').classList.add('active');
-      }
-    } else {
-      resPill.style.display = 'inline-block';
-    }
-
-    const tierData = cityData[groupState.acc];
-
-    // Update tier prices in the table
-    tiers.forEach(t => {
-      const tierId = t.getAttribute('data-tier');
-      const priceEl = t.querySelector('.tier-price');
-      if (tierData[tierId]) {
-        const headPrice = tierData[tierId];
-        // Only 6+ teachers tier shows the dynamic total based on quantity
-        if (tierId === '6-plus' && groupState.qty > 1) {
-          const totalPrice = headPrice * groupState.qty;
-          priceEl.innerHTML = `₹${totalPrice.toLocaleString()} <span class="sub-detail">(₹${headPrice.toLocaleString()}/head)</span>`;
-        } else {
-          priceEl.textContent = `₹${headPrice.toLocaleString()}/head`;
-        }
-      }
-    });
-
-
-
-    // Update active tier class
-    tiers.forEach(t => t.classList.remove('active'));
-    let selectedTier;
-    if (groupState.qty <= 4) selectedTier = 'up-to-4';
-    else if (groupState.qty === 5) selectedTier = '5-teachers';
-    else selectedTier = '6-plus';
-
-    const activeTier = cardGroup.querySelector(`[data-tier="${selectedTier}"]`);
-    activeTier.classList.add('active');
-    activeTier.querySelector('input').checked = true;
-  };
-
-  accPills.forEach(pill => pill.onclick = () => {
-    accPills.forEach(p => p.classList.remove('active'));
-    pill.classList.add('active');
-    groupState.acc = pill.getAttribute('data-acc');
-    updateGroup();
-  });
-
-
-  cardGroup.querySelector('.qty-btn.plus').onclick = () => {
-    let q = parseInt(qtyInput.value);
-    if (q < 10) {
-      qtyInput.value = q + 1;
-      groupState.qty = q + 1;
-      updateGroup();
-    }
-  };
-  cardGroup.querySelector('.qty-btn.minus').onclick = () => {
-    let q = parseInt(qtyInput.value);
-    if (q > 6) { // Min quantity set to 6
-      qtyInput.value = q - 1;
-      groupState.qty = q - 1;
-      updateGroup();
-    }
-  };
-
-
-  cityBtns.forEach(btn => btn.onclick = () => {
-    cityBtns.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    groupState.city = btn.getAttribute('data-city');
-    btn.closest('.city-toggle').setAttribute('data-city', groupState.city);
-    updateGroup();
-  });
-
-  updateGroup();
-}
-
-
-
-
-
-// --- 3. Registration Modal & Payment Flow ---
+// --- Registration Modal & Payment Flow ---
+let currentOrderData = { amount: 0 };
 const modal = document.getElementById("registerModal");
-const payButtons = document.querySelectorAll(".pay-now");
-const closeBtn = document.querySelector(".close");
 const registerForm = document.querySelector(".register-form");
 
-payButtons.forEach(button => {
-  button.onclick = () => {
-    // Find which card it is and set the amount
-    const card = button.closest('.p-card');
-    if (card.id === 'card-reserve') {
-      const qty = parseInt(card.querySelector('.qty-input').value);
-      currentOrderData.amount = qty * PRICES.RESERVE;
-    } else if (card.id === 'card-individual') {
-      const activeDisplay = card.querySelector('.radio-label.active .acc-price-display');
-      const rateStr = activeDisplay.textContent.replace(/[₹,]/g, '');
-      currentOrderData.amount = parseInt(rateStr);
-    } else if (card.id === 'card-group') {
-      const qty = parseInt(card.querySelector('.qty-input').value);
-      const activeTier = card.querySelector('.p-table-row.active');
-      const priceStr = activeTier.querySelector('.tier-price').textContent.split('/')[0].replace(/[₹,]/g, '');
-      currentOrderData.amount = qty * parseInt(priceStr);
-    }
+const closeBtn = document.querySelector(".close");
 
-
+window.openRegisterModal = function () {
+  if (modal) {
     modal.style.display = "flex";
     document.body.style.overflow = "hidden";
-  };
+  }
+};
+
+const payButtons = document.querySelectorAll(".pay-now");
+payButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    // If it was already handled by reserveNow, skip amount calculation here
+    if (button.hasAttribute('onclick') && button.getAttribute('onclick').includes('reserveNow')) return;
+
+    const card = button.closest('.p-card');
+    if (!card) return;
+
+    if (card.id.includes('individual') || card.id.includes('flexible')) {
+      const prefix = card.id.startsWith('m-') ? 'm' : 'd';
+      const cityShort = document.getElementById(prefix + '-btn-blr').classList.contains('active') ? 'blr' : 'pun';
+      const radio = document.querySelector(`input[name="${prefix}-accom-${cityShort}"]:checked`);
+      const priceStr = radio.closest('.accom-option').querySelector('.accom-price').textContent;
+      currentOrderData.amount = parseInt(priceStr.replace(/[₹,]/g, ''));
+    } else if (card.id.includes('group')) {
+      const p = card.id.startsWith('m-') ? 'm' : 'd';
+      const cityFull = window.gState[p].city;
+      const acc = window.gState[p].acc;
+      const gq = window.gState[p].qty;
+      const data = GROUP_PRICES[cityFull][acc];
+
+      if (gq <= 4) currentOrderData.amount = data['up-to-4'] * gq;
+      else if (gq === 5) currentOrderData.amount = data['5-teachers'] * 5;
+      else currentOrderData.amount = data['6-plus'] * gq;
+    }
+
+    window.openRegisterModal();
+  });
 });
 
-
-closeBtn.onclick = () => {
-  modal.style.display = "none";
-  document.body.style.overflow = "auto";
-};
+if (closeBtn) {
+  closeBtn.onclick = () => {
+    modal.style.display = "none";
+    document.body.style.overflow = "auto";
+  };
+}
 
 window.onclick = function (event) {
   if (event.target == modal) {
