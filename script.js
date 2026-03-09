@@ -430,37 +430,39 @@ registerForm.addEventListener('submit', async (e) => {
       modal.style.display = "none";
       document.body.style.overflow = "auto";
 
-      // Redirect to Paytm Standard Checkout Page
-      const paytmUrl = `https://${data.environment}/theia/api/v1/showPaymentPage?mid=${data.mid}&orderId=${data.orderId}`;
+      // --- START PAYTM JS CHECKOUT (OVERLAY) ---
+      const config = {
+        "root": "",
+        "flow": "DEFAULT",
+        "data": {
+          "orderId": data.orderId,
+          "token": data.txnToken,
+          "tokenType": "TXN_TOKEN",
+          "amount": data.amount.toString() + ".00"
+        },
+        "merchant": {
+          "mid": data.mid,
+          "redirect": true // This will redirect back to our callbackUrl after completion in the overlay
+        },
+        "handler": {
+          "notifyMerchant": function (eventName, data) {
+            console.log("notifyMerchant event => ", eventName, data);
+          }
+        }
+      };
 
-      // Create a hidden form to submit the request
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = paytmUrl;
-
-      // Add the txnToken as a hidden input
-      const txnTokenInput = document.createElement('input');
-      txnTokenInput.type = 'hidden';
-      txnTokenInput.name = 'txnToken';
-      txnTokenInput.value = data.txnToken;
-      form.appendChild(txnTokenInput);
-
-      // Add the mid as a hidden input
-      const midInput = document.createElement('input');
-      midInput.type = 'hidden';
-      midInput.name = 'mid';
-      midInput.value = data.mid;
-      form.appendChild(midInput);
-
-      // Add the orderId as a hidden input
-      const orderIdInput = document.createElement('input');
-      orderIdInput.type = 'hidden';
-      orderIdInput.name = 'orderId';
-      orderIdInput.value = data.orderId;
-      form.appendChild(orderIdInput);
-
-      document.body.appendChild(form);
-      form.submit();
+      if (window.Paytm && window.Paytm.CheckoutJS) {
+        window.Paytm.CheckoutJS.init(config).then(function onSuccess() {
+          // after successfully updating configuration, invoke checkoutjs
+          window.Paytm.CheckoutJS.invoke();
+        }).catch(function onError(error) {
+          console.log("error => ", error);
+          alert("Could not open payment window. Please try again.");
+        });
+      } else {
+        alert("Paytm Checkout is not loaded. Please refresh and try again.");
+      }
+      // --- END PAYTM JS CHECKOUT ---
 
     } else {
       console.error("Payment Error Details:", data);
