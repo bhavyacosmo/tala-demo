@@ -5,7 +5,7 @@ require('dotenv').config();
 const PAYTM_MID = process.env.PAYTM_MID || "NvwNCG76079722724032";
 const PAYTM_MERCHANT_KEY = process.env.PAYTM_MERCHANT_KEY || "x#Fi@Q7FecmG%3eP";
 const PAYTM_WEBSITE = process.env.PAYTM_WEBSITE || "WEBSTAGING";
-const PAYTM_ENV = 'securegw-stage.paytm.in';
+const PAYTM_ENV = 'securestage.paytmpayments.com';
 
 async function testPaytm() {
     const orderId = 'TESTORDER' + Date.now();

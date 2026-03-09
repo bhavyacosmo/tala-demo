@@ -44,6 +44,24 @@ document.addEventListener('DOMContentLoaded', () => {
       mobileMenuBtn.classList.toggle('active');
     });
   }
+
+  // --- Payment Status Notifications (from URL)
+  const urlParams = new URLSearchParams(window.location.search);
+  const status = urlParams.get('status');
+  const orderId = urlParams.get('orderId');
+  const msg = urlParams.get('msg');
+
+  if (status) {
+    if (status === 'success') {
+      alert(`🎉 Payment Successful!\nOrder ID: ${orderId}\n\nThank you for registering. You will receive a confirmation email shortly.`);
+    } else if (status === 'failed') {
+      alert(`❌ Payment Failed!\nOrder ID: ${orderId}\nReason: ${msg || 'Unknown error'}\n\nPlease try again or contact support if the issue persists.`);
+    } else if (status === 'cancelled') {
+      alert(`⚠️ Payment Cancelled\n\nThe transaction was not completed. You can try again whenever you are ready.`);
+    }
+    // Clean up URL parameters without refreshing the page
+    window.history.replaceState({}, document.title, "/");
+  }
 });
 
 
@@ -392,7 +410,7 @@ registerForm.addEventListener('submit', async (e) => {
 
   try {
     // 2. Call our backend to initiate the transaction
-    const response = await fetch('/paytm/initiate', {
+    const response = await fetch('./paytm/initiate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

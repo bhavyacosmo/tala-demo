@@ -25,37 +25,52 @@ console.log("KEY length:", PAYTM_MERCHANT_KEY.length);
 
 
 // For Staging
-const PAYTM_ENV = 'securegw-stage.paytm.in';
+const PAYTM_ENV = 'securestage.paytmpayments.com';
 // For Production
-// const PAYTM_ENV = 'securegw.paytm.in';
+// const PAYTM_ENV = 'secure.paytmpayments.com';
 
 app.post('/paytm/initiate', async (req, res) => {
     try {
         const { amount, customerId, customerEmail, customerPhone } = req.body;
+        console.log("--- INITIATING PAYMENT ---");
+        console.log("Amount:", amount);
+        console.log("Customer:", { customerId, customerEmail, customerPhone });
 
-        if (!amount || !customerId) {
-            return res.status(400).json({ error: "Missing required fields (amount, customerId)" });
+        if (!amount || isNaN(amount) || amount <= 0) {
+            console.error("Invalid amount received:", amount);
+            return res.status(400).json({ error: "Invalid amount" });
         }
 
         const orderId = 'ORD' + new Date().getTime();
 
-        const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
-        const paytmParams = {};
+        // Use BASE_URL from .env if available, otherwise detect dynamically
+        let callbackUrl;
+        if (process.env.BASE_URL) {
+            // Trim trailing slash if present and add the route
+            const base = process.env.BASE_URL.replace(/\/$/, '');
+            callbackUrl = `${base}/paytm/callback`;
+        } else {
+            const protocol = req.get('x-forwarded-proto') || req.protocol;
+            const host = req.get('host');
+            callbackUrl = `${protocol}://${host}/paytm/callback`;
+        }
 
+        console.log("Calculated Callback URL:", callbackUrl);
+
+        const paytmParams = {};
         paytmParams.body = {
             "requestType": "Payment",
             "mid": PAYTM_MID,
             "websiteName": PAYTM_WEBSITE,
             "orderId": orderId,
-            "callbackUrl": `https://talaeducation.com/paytm-callback`,
-
+            "callbackUrl": callbackUrl,
             "txnAmount": {
                 "value": amount.toString() + ".00",
                 "currency": "INR",
             },
             "userInfo": {
                 "custId": customerId.toString().replace(/[^a-zA-Z0-9]/g, '').substring(0, 50),
-                "mobile": customerPhone ? customerPhone.replace(/[^0-9]/g, '').substring(0, 10) : undefined,
+                "mobile": customerPhone ? customerPhone.replace(/[^0-9]/g, '').slice(-10) : undefined,
                 "email": customerEmail || undefined
             },
             "channelId": "WEB"
@@ -68,7 +83,7 @@ app.post('/paytm/initiate', async (req, res) => {
         };
 
         const post_data = JSON.stringify(paytmParams);
-        console.log("Paytm Request Body:", post_data);
+        console.log("Request to Paytm:", post_data);
 
 
         const options = {
@@ -89,19 +104,25 @@ app.post('/paytm/initiate', async (req, res) => {
             });
 
             post_res.on('end', function () {
-                console.log('Response: ', response);
-                const result = JSON.parse(response);
-                if (result.body && result.body.txnToken) {
-                    res.json({
-                        success: true,
-                        txnToken: result.body.txnToken,
-                        orderId: orderId,
-                        amount: amount,
-                        mid: PAYTM_MID,
-                        environment: PAYTM_ENV
-                    });
-                } else {
-                    res.status(500).json({ error: "Failed to generate txnToken", details: result });
+                console.log('PAYTM RAW RESPONSE: ', response);
+                try {
+                    const result = JSON.parse(response);
+                    if (result.body && result.body.txnToken) {
+                        res.json({
+                            success: true,
+                            txnToken: result.body.txnToken,
+                            orderId: orderId,
+                            amount: amount,
+                            mid: PAYTM_MID,
+                            environment: PAYTM_ENV
+                        });
+                    } else {
+                        console.error("Paytm Initiation Failed:", result);
+                        res.status(500).json({ error: "Failed to generate txnToken", details: result });
+                    }
+                } catch (parseErr) {
+                    console.error("Failed to parse Paytm response:", response);
+                    res.status(500).json({ error: "Invalid response from Paytm" });
                 }
             });
         });
@@ -115,22 +136,39 @@ app.post('/paytm/initiate', async (req, res) => {
         post_req.end();
 
     } catch (error) {
-        console.error("Error initiating payment:", error);
+        console.error("Internal Server Error:", error);
         res.status(500).json({ error: "Server error", message: error.message });
     }
 });
 
-// Callback URL Handler (simplified)
-app.post('/paytm/callback', (req, res) => {
-    console.log("Paytm Callback Payload:", req.body);
-    // Here you would normally verify the checksum of the response
-    // and update your database with the transaction status.
+// Callback URL Handler - Handles both POST (from Paytm) and GET (manual navigations)
+app.all('/paytm/callback', (req, res) => {
+    console.log("--- PAYTM CALLBACK RECEIVED ---");
+    console.log("Method:", req.method);
+    console.log("Body:", req.body);
+    console.log("Query:", req.query);
 
-    // For now, just redirect back to the home page with the status
-    if (req.body.STATUS === 'TXN_SUCCESS') {
-        res.redirect('/?status=success&orderId=' + req.body.ORDERID);
+    // Determine the redirect base (the homepage of the redesign app)
+    const redirectBase = process.env.BASE_URL || '../';
+    console.log("Redirecting to base:", redirectBase);
+
+    // If it's a GET request or missing status, it's likely a cancellation or manual back
+    if (req.method === 'GET' || !req.body || Object.keys(req.body).length === 0) {
+        console.log("Manual navigation or cancellation detected via GET");
+        return res.redirect(`${redirectBase}?status=cancelled`);
+    }
+
+    const { STATUS, ORDERID, RESPMSG } = req.body;
+
+    if (STATUS === 'TXN_SUCCESS') {
+        const finalUrl = `${redirectBase}?status=success&orderId=${ORDERID}`;
+        console.log("Redirecting to:", finalUrl);
+        res.redirect(finalUrl);
     } else {
-        res.redirect('/?status=failed&orderId=' + req.body.ORDERID);
+        console.log("Transaction Failed/Cancelled:", RESPMSG);
+        const finalUrl = `${redirectBase}?status=failed&orderId=${ORDERID || 'unknown'}&msg=${encodeURIComponent(RESPMSG || '')}`;
+        console.log("Redirecting to:", finalUrl);
+        res.redirect(finalUrl);
     }
 });
 
