@@ -240,7 +240,7 @@ a {
 }
 
 .section {
-    padding: 6rem 0;
+    padding: 3rem 0;
     background: var(--white);
 }
 
@@ -1712,9 +1712,9 @@ RESPONSIVE
 .pricing-grid-3 {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
+    gap: 1rem;
     max-width: 1140px;
-    margin: 2rem auto 0;
+    margin: 1rem auto 0;
     align-items: stretch;
 }
 
@@ -2127,14 +2127,14 @@ RESPONSIVE
 .card {
     background: #fff;
     border-radius: 20px;
-    padding: 24px 20px 20px;
+    padding: 16px 16px 14px;
     border: 2px solid transparent;
     display: flex;
     flex-direction: column;
     min-width: 0;
     box-shadow: 0 4px 24px rgba(26, 35, 64, 0.08);
     position: relative;
-    padding-bottom: 60px;
+    padding-bottom: 52px;
     /* Space for absolute footer note */
 }
 
@@ -2177,12 +2177,12 @@ RESPONSIVE
 }
 
 .card-title {
-    font-size: clamp(1.2rem, 2vw, 1.5rem);
+    font-size: clamp(1.1rem, 1.8vw, 1.35rem);
     font-weight: 800;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
 }
 
@@ -2197,11 +2197,11 @@ RESPONSIVE
 .btn-pay {
     display: block;
     width: 100%;
-    padding: 12px;
+    padding: 10px;
     border: none;
-    border-radius: 12px;
+    border-radius: 10px;
     font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 800;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -2219,18 +2219,18 @@ RESPONSIVE
 }
 
 .card-footer-note {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     color: #6b7594;
     text-align: center;
-    line-height: 1.6;
+    line-height: 1.4;
     position: absolute;
-    bottom: 20px;
-    left: 20px;
-    right: 20px;
+    bottom: 12px;
+    left: 16px;
+    right: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 28px;
+    min-height: 24px;
 }
 
 .card-footer-note a {
@@ -2251,27 +2251,27 @@ RESPONSIVE
 .price-badge {
     background: #f5b800;
     color: #1a2340;
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     font-weight: 800;
     border-radius: 20px;
-    padding: 2px 10px;
+    padding: 1px 8px;
     display: inline-block;
 }
 
 .feature-list {
     list-style: none;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .feature-list li {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
-    font-size: 0.86rem;
+    gap: 6px;
+    font-size: 0.8rem;
     color: #2d3a5a;
-    padding: 6px 0;
+    padding: 4px 0;
     border-bottom: 1px solid #f0eedf;
-    line-height: 1.4;
+    line-height: 1.3;
 }
 
 .feature-list li:last-child {
@@ -2285,7 +2285,7 @@ RESPONSIVE
 }
 
 .qty-wrapper {
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .qty-label {
@@ -2340,10 +2340,10 @@ RESPONSIVE
 }
 
 .qty-total {
-    font-size: 1.05rem;
+    font-size: 0.95rem;
     font-weight: 600;
     color: #6b7594;
-    margin-top: 6px;
+    margin-top: 4px;
     display: flex;
     align-items: center;
     gap: 6px;
@@ -2351,7 +2351,7 @@ RESPONSIVE
 
 .qty-total span {
     font-weight: 800;
-    font-size: 1.35rem;
+    font-size: 1.25rem;
     color: #1a2340;
     line-height: 1;
 }
@@ -2373,7 +2373,7 @@ RESPONSIVE
 .city-toggle-wrapper {
     display: flex;
     justify-content: center;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .city-toggle {
@@ -2410,14 +2410,14 @@ RESPONSIVE
     background: #fffbeb;
     border: 1px solid #f5b800;
     border-radius: 8px;
-    padding: 6px 10px;
-    font-size: 0.8rem;
+    padding: 4px 8px;
+    font-size: 0.75rem;
     font-weight: 500;
     color: #92650a;
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .plan-label {
@@ -2437,11 +2437,11 @@ RESPONSIVE
 }
 
 .plan-btn {
-    padding: 6px 14px;
+    padding: 5px 12px;
     border: 1.5px solid #d1d9ed;
-    border-radius: 8px;
+    border-radius: 6px;
     background: #fff;
-    font-size: 0.88rem;
+    font-size: 0.82rem;
     font-weight: 600;
     color: #5a6482;
     cursor: pointer;
@@ -2486,10 +2486,10 @@ RESPONSIVE
 .accom-option {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 8px 12px;
+    gap: 10px;
+    padding: 6px 10px;
     border: 1.5px solid #d1d9ed;
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: pointer;
     transition: border-color 0.18s, background 0.18s;
     background: #f8faff;
@@ -2674,14 +2674,14 @@ RESPONSIVE
     background: #f0fdf4;
     border: 1px solid #bbf7d0;
     border-radius: 8px;
-    padding: 6px 10px;
-    font-size: 0.82rem;
+    padding: 4px 8px;
+    font-size: 0.78rem;
     font-weight: 600;
     color: #15803d;
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .group-table {
@@ -2714,8 +2714,8 @@ RESPONSIVE
 }
 
 .group-table tbody td {
-    padding: 8px 6px;
-    font-size: 0.85rem;
+    padding: 6px 6px;
+    font-size: 0.8rem;
     vertical-align: top;
 }
 
