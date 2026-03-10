@@ -447,6 +447,11 @@ registerForm.addEventListener('submit', async (e) => {
         "handler": {
           "notifyMerchant": function (eventName, data) {
             console.log("notifyMerchant event => ", eventName, data);
+            if (eventName === 'APP_CLOSED') {
+              // Reset the submit button if the user manually closes the overlay
+              submitBtn.textContent = 'Submit';
+              submitBtn.disabled = false;
+            }
           }
         }
       };
