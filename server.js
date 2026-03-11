@@ -1,12 +1,9 @@
 require('dotenv').config();
 const express = require('express');
-const fs = require('fs');
 const cors = require('cors');
 const https = require('https');
 const PaytmChecksum = require('paytmchecksum');
 const path = require('path');
-
-const PID = Math.floor(Math.random() * 9000) + 1000;
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -35,7 +32,7 @@ const PAYTM_ENV = 'securestage.paytmpayments.com';
 async function sendToGoogleSheet(payload, urlOverride = null) {
     const webhookUrl = urlOverride || process.env.GOOGLE_SHEET_WEBHOOK_URL;
     if (!webhookUrl) {
-        superLog("⚠️ Google Sheet Webhook URL not set. Skipping log.");
+        console.log("⚠️ Google Sheet Webhook URL not set. Skipping log.");
         return;
     }
 
@@ -56,14 +53,14 @@ async function sendToGoogleSheet(payload, urlOverride = null) {
             options.headers['Content-Length'] = Buffer.byteLength(postData);
         }
 
-        superLog(`[GoogleSheet] 📤 Sending ${payload.action}...`);
+        console.log(`[GoogleSheet] 📤 Sending ${payload.action}...`);
 
         const req = https.request(options, (res) => {
-            superLog(`[GoogleSheet] 📥 Response: ${res.statusCode}`);
+            console.log(`[GoogleSheet] 📥 Response: ${res.statusCode}`);
 
             // Handle Redirects (Google Script sends a 302 after successful POST)
             if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-                superLog("[GoogleSheet] ➡️ Following redirect...");
+                console.log("[GoogleSheet] ➡️ Following redirect...");
                 // Note: For Google Apps Script, if we hit the redirect, it means the data was ALREADY processed.
                 // We follow with a GET just to verify/complete the flow.
                 return sendToGoogleSheet(payload, res.headers.location);
@@ -73,34 +70,34 @@ async function sendToGoogleSheet(payload, urlOverride = null) {
             res.on('data', (d) => { body += d; });
             res.on('end', () => {
                 if (res.statusCode === 200 || res.statusCode === 201) {
-                    superLog("✅ [GoogleSheet] SUCCESS!");
+                    console.log("✅ [GoogleSheet] SUCCESS!");
                 } else {
-                    superLog(`⚠️ [GoogleSheet] Final Response (${res.statusCode}):`, body.substring(0, 100));
+                    console.log(`⚠️ [GoogleSheet] Final Response (${res.statusCode}):`, body.substring(0, 100));
                 }
             });
         });
 
-        req.on('error', (e) => superLog("❌ [GoogleSheet] Request ERROR:", e.message));
+        req.on('error', (e) => console.log("❌ [GoogleSheet] Request ERROR:", e.message));
 
         if (!urlOverride) {
             req.write(postData);
         }
         req.end();
     } catch (err) {
-        superLog("❌ [GoogleSheet] CRITICAL ERROR:", err.message);
+        console.log("❌ [GoogleSheet] CRITICAL ERROR:", err.message);
     }
 }
 
 app.post('/paytm/initiate', async (req, res) => {
-    superLog("\n🚀 Received /paytm/initiate request");
+    console.log("\n🚀 Received /paytm/initiate request");
     try {
         const { amount, customerId, customerEmail, customerPhone } = req.body;
-        superLog("--- INITIATING PAYMENT ---");
-        superLog("Amount:", amount);
-        superLog("Customer:", { customerId, customerEmail, customerPhone });
+        console.log("--- INITIATING PAYMENT ---");
+        console.log("Amount:", amount);
+        console.log("Customer:", { customerId, customerEmail, customerPhone });
 
         if (!amount || isNaN(amount) || amount <= 0) {
-            superLog("Invalid amount received:", amount);
+            console.log("Invalid amount received:", amount);
             return res.status(400).json({ error: "Invalid amount" });
         }
 
@@ -118,7 +115,7 @@ app.post('/paytm/initiate', async (req, res) => {
             callbackUrl = `${protocol}://${host}/paytm/callback`;
         }
 
-        superLog("Calculated Callback URL:", callbackUrl);
+        console.log("Calculated Callback URL:", callbackUrl);
 
         const paytmParams = {};
         paytmParams.body = {
@@ -146,7 +143,7 @@ app.post('/paytm/initiate', async (req, res) => {
         };
 
         const post_data = JSON.stringify(paytmParams);
-        superLog("Request to Paytm:", post_data);
+        console.log("Request to Paytm:", post_data);
 
 
         const options = {
@@ -167,7 +164,7 @@ app.post('/paytm/initiate', async (req, res) => {
             });
 
             post_res.on('end', function () {
-                superLog('PAYTM RAW RESPONSE: ', response);
+                console.log('PAYTM RAW RESPONSE: ', response);
                 try {
                     const result = JSON.parse(response);
                     if (result.body && result.body.txnToken) {
@@ -194,18 +191,18 @@ app.post('/paytm/initiate', async (req, res) => {
                             amount: amount
                         });
                     } else {
-                        superLog("Paytm Initiation Failed:", result);
+                        console.log("Paytm Initiation Failed:", result);
                         res.status(500).json({ error: "Failed to generate txnToken", details: result });
                     }
                 } catch (parseErr) {
-                    superLog("Failed to parse Paytm response:", response);
+                    console.log("Failed to parse Paytm response:", response);
                     res.status(500).json({ error: "Invalid response from Paytm" });
                 }
             });
         });
 
         post_req.on('error', (error) => {
-            superLog("HTTPS request error:", error);
+            console.log("HTTPS request error:", error);
             res.status(500).json({ error: "HTTPS request failed", details: error.message });
         });
 
@@ -213,17 +210,17 @@ app.post('/paytm/initiate', async (req, res) => {
         post_req.end();
 
     } catch (error) {
-        superLog("Internal Server Error:", error);
+        console.log("Internal Server Error:", error);
         res.status(500).json({ error: "Server error", message: error.message });
     }
 });
 
 // Callback URL Handler - Handles both POST (from Paytm) and GET (manual navigations)
 app.all('/paytm/callback', (req, res) => {
-    superLog("--- PAYTM CALLBACK RECEIVED ---");
-    superLog("Method:", req.method);
-    superLog("Body:", req.body);
-    superLog("Query:", req.query);
+    console.log("--- PAYTM CALLBACK RECEIVED ---");
+    console.log("Method:", req.method);
+    console.log("Body:", req.body);
+    console.log("Query:", req.query);
 
     // Determine the redirect base (the homepage of the redesign app)
     const redirectBase = process.env.BASE_URL || '../';
