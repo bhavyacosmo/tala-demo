@@ -337,6 +337,10 @@ window.refreshGroup = function (p, cityShort) {
 let currentOrderData = { amount: 0 };
 const modal = document.getElementById("registerModal");
 const registerForm = document.querySelector(".register-form");
+if (!registerForm) {
+  console.error("❌ CRITICAL: .register-form NOT FOUND in the HTML!");
+  alert("Technical Error: Registration form not found on this page.");
+}
 
 const closeBtn = document.querySelector(".close");
 
@@ -396,25 +400,39 @@ window.onclick = function (event) {
 registerForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const name = registerForm.querySelector('input[placeholder="Name *"]').value;
-  const phone = registerForm.querySelector('input[placeholder="Phone Number *"]').value;
-  const officialEmail = registerForm.querySelector('input[placeholder="Official email *"]').value;
-  const personalEmail = registerForm.querySelector('input[placeholder="Personal email *"]').value;
-  const school = registerForm.querySelector('input[placeholder="Name of school/organisation *"]').value;
-  const city = registerForm.querySelector('input[placeholder="What city are you coming from? *"]').value;
-  const subjects = registerForm.querySelector('textarea[placeholder="What subjects and age group do you teach?"]').value;
-
-  const amount = currentOrderData.amount;
-  const customerId = 'CUST_' + phone.replace(/\s+/g, '');
-
-  const submitBtn = registerForm.querySelector('.submit-btn');
-  submitBtn.textContent = 'Processing...';
-  submitBtn.disabled = true;
-
-
   try {
+    const nameInput = registerForm.querySelector('input[placeholder="Name *"]');
+    const phoneInput = registerForm.querySelector('input[placeholder="Phone Number *"]');
+    const officialEmailInput = registerForm.querySelector('input[placeholder="Official email *"]');
+    const personalEmailInput = registerForm.querySelector('input[placeholder="Personal email *"]');
+    const schoolInput = registerForm.querySelector('input[placeholder="Name of school/organisation *"]');
+    const cityInput = registerForm.querySelector('input[placeholder="What city are you coming from? *"]');
+    const subjectsInput = registerForm.querySelector('textarea[placeholder="What subjects and age group do you teach?"]');
+
+    if (!nameInput || !phoneInput || !officialEmailInput || !personalEmailInput || !schoolInput || !cityInput || !subjectsInput) {
+      console.error("❌ One or more form fields could not be found!");
+      console.log("Details:", { nameInput, phoneInput, officialEmailInput, personalEmailInput, schoolInput, cityInput, subjectsInput });
+      alert("Technical Error: Some form fields are missing. Please try refreshing the page.");
+      return;
+    }
+
+    const name = nameInput.value;
+    const phone = phoneInput.value;
+    const officialEmail = officialEmailInput.value;
+    const personalEmail = personalEmailInput.value;
+    const school = schoolInput.value;
+    const city = cityInput.value;
+    const subjects = subjectsInput.value;
+
+    const amount = currentOrderData.amount;
+    const customerId = 'CUST_' + phone.replace(/\s+/g, '');
+
+    const submitBtn = registerForm.querySelector('.submit-btn');
+    submitBtn.textContent = 'Processing...';
+    submitBtn.disabled = true;
+
     // 2. Call our backend to initiate the transaction
-    const response = await fetch('./paytm/initiate', {
+    const response = await fetch('/paytm/initiate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -432,12 +450,18 @@ registerForm.addEventListener('submit', async (e) => {
       })
     });
 
+    if (!response.ok) {
+      throw new Error(`Server responded with ${response.status}`);
+    }
+
     const data = await response.json();
 
     if (data.success) {
       // Close our registration modal
       modal.style.display = "none";
       document.body.style.overflow = "auto";
+
+      // ... rest of the payment logic ...
 
       // --- START PAYTM JS CHECKOUT (OVERLAY) ---
       const config = {

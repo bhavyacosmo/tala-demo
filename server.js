@@ -1,10 +1,20 @@
 require('dotenv').config();
 const express = require('express');
+const fs = require('fs');
 const cors = require('cors');
 const https = require('https');
 const PaytmChecksum = require('paytmchecksum');
 const path = require('path');
 
+const PID = Math.floor(Math.random() * 9000) + 1000;
+const logStream = fs.createWriteStream(path.join(__dirname, 'server_debug.log'), { flags: 'a' });
+
+function superLog(msg) {
+    const timestamp = new Date().toLocaleTimeString();
+    console.log(`[${timestamp}] ${msg}`);
+}
+
+superLog("--- SERVER STARTING ---");
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -13,6 +23,12 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files from the current directory
 app.use(express.static(__dirname));
 
+// --- GLOBAL REQUEST LOGGING (DEBUG) ---
+app.use((req, res, next) => {
+    superLog(`🔍 Incoming: ${req.method} ${req.url}`);
+    next();
+});
+
 const PORT = process.env.PORT || 3000;
 
 // Paytm Configuration
@@ -20,9 +36,7 @@ const PAYTM_MID = process.env.PAYTM_MID || "NvwNCG76079722724032";
 const PAYTM_MERCHANT_KEY = process.env.PAYTM_MERCHANT_KEY || "x#Fi@Q7FecmG%3eP";
 const PAYTM_WEBSITE = process.env.PAYTM_WEBSITE || "WEBSTAGING";
 
-console.log("MID length:", PAYTM_MID.length);
-console.log("KEY length:", PAYTM_MERCHANT_KEY.length);
-
+superLog("Google Webhook: " + (process.env.GOOGLE_SHEET_WEBHOOK_URL ? "CONFIGURED" : "MISSING"));
 
 // For Staging
 const PAYTM_ENV = 'securestage.paytmpayments.com';
@@ -30,48 +44,77 @@ const PAYTM_ENV = 'securestage.paytmpayments.com';
 // const PAYTM_ENV = 'secure.paytmpayments.com';
 
 /**
- * Helper to send data to Google Sheet Webhook
+ * Helper to send data to Google Sheet Webhook (with redirect following)
  */
-async function sendToGoogleSheet(payload) {
-    const webhookUrl = process.env.GOOGLE_SHEET_WEBHOOK_URL;
+async function sendToGoogleSheet(payload, urlOverride = null) {
+    const webhookUrl = urlOverride || process.env.GOOGLE_SHEET_WEBHOOK_URL;
     if (!webhookUrl) {
-        console.log("⚠️ Google Sheet Webhook URL not set. Skipping log.");
+        superLog("⚠️ Google Sheet Webhook URL not set. Skipping log.");
         return;
     }
 
     try {
         const url = new URL(webhookUrl);
+        const postData = JSON.stringify(payload);
+
         const options = {
             hostname: url.hostname,
-            path: url.pathname + url.search,
-            method: 'POST',
+            path: url.pathname + url.search || "/",
+            method: urlOverride ? 'GET' : 'POST', // Use GET for redirects (Google Script requirement)
             headers: {
                 'Content-Type': 'application/json'
             }
         };
 
-        const post_req = https.request(options, (res) => {
-            res.on('data', () => { }); // Consume data
+        if (!urlOverride) {
+            options.headers['Content-Length'] = Buffer.byteLength(postData);
+        }
+
+        superLog(`[GoogleSheet] 📤 Sending ${payload.action}...`);
+
+        const req = https.request(options, (res) => {
+            superLog(`[GoogleSheet] 📥 Response: ${res.statusCode}`);
+
+            // Handle Redirects (Google Script sends a 302 after successful POST)
+            if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+                superLog("[GoogleSheet] ➡️ Following redirect...");
+                // Note: For Google Apps Script, if we hit the redirect, it means the data was ALREADY processed.
+                // We follow with a GET just to verify/complete the flow.
+                return sendToGoogleSheet(payload, res.headers.location);
+            }
+
+            let body = '';
+            res.on('data', (d) => { body += d; });
+            res.on('end', () => {
+                if (res.statusCode === 200 || res.statusCode === 201) {
+                    superLog("✅ [GoogleSheet] SUCCESS!");
+                } else {
+                    superLog(`⚠️ [GoogleSheet] Final Response (${res.statusCode}):`, body.substring(0, 100));
+                }
+            });
         });
 
-        post_req.on('error', (e) => console.error("Google Sheet error:", e));
-        post_req.write(JSON.stringify(payload));
-        post_req.end();
-        console.log("➡️ Data signaled to Google Sheet:", payload.action);
+        req.on('error', (e) => superLog("❌ [GoogleSheet] Request ERROR:", e.message));
+
+        if (!urlOverride) {
+            req.write(postData);
+        }
+        req.end();
     } catch (err) {
-        console.error("Failed to signal Google Sheet:", err.message);
+        superLog("❌ [GoogleSheet] CRITICAL ERROR:", err.message);
     }
 }
 
 app.post('/paytm/initiate', async (req, res) => {
+    superLog("\n🚀 Received /paytm/initiate request");
     try {
         const { amount, customerId, customerEmail, customerPhone } = req.body;
-        console.log("--- INITIATING PAYMENT ---");
-        console.log("Amount:", amount);
-        console.log("Customer:", { customerId, customerEmail, customerPhone });
+        superLog("--- INITIATING PAYMENT ---");
+        superLog("Amount:", amount);
+        superLog("Customer:", { customerId, customerEmail, customerPhone });
 
         if (!amount || isNaN(amount) || amount <= 0) {
-            console.error("Invalid amount received:", amount);
+            superLog("Invalid amount received:", amount);
             return res.status(400).json({ error: "Invalid amount" });
         }
 
@@ -89,7 +132,7 @@ app.post('/paytm/initiate', async (req, res) => {
             callbackUrl = `${protocol}://${host}/paytm/callback`;
         }
 
-        console.log("Calculated Callback URL:", callbackUrl);
+        superLog("Calculated Callback URL:", callbackUrl);
 
         const paytmParams = {};
         paytmParams.body = {
@@ -117,7 +160,7 @@ app.post('/paytm/initiate', async (req, res) => {
         };
 
         const post_data = JSON.stringify(paytmParams);
-        console.log("Request to Paytm:", post_data);
+        superLog("Request to Paytm:", post_data);
 
 
         const options = {
@@ -138,7 +181,7 @@ app.post('/paytm/initiate', async (req, res) => {
             });
 
             post_res.on('end', function () {
-                console.log('PAYTM RAW RESPONSE: ', response);
+                superLog('PAYTM RAW RESPONSE: ', response);
                 try {
                     const result = JSON.parse(response);
                     if (result.body && result.body.txnToken) {
@@ -165,18 +208,18 @@ app.post('/paytm/initiate', async (req, res) => {
                             amount: amount
                         });
                     } else {
-                        console.error("Paytm Initiation Failed:", result);
+                        superLog("Paytm Initiation Failed:", result);
                         res.status(500).json({ error: "Failed to generate txnToken", details: result });
                     }
                 } catch (parseErr) {
-                    console.error("Failed to parse Paytm response:", response);
+                    superLog("Failed to parse Paytm response:", response);
                     res.status(500).json({ error: "Invalid response from Paytm" });
                 }
             });
         });
 
         post_req.on('error', (error) => {
-            console.error("HTTPS request error:", error);
+            superLog("HTTPS request error:", error);
             res.status(500).json({ error: "HTTPS request failed", details: error.message });
         });
 
@@ -184,17 +227,17 @@ app.post('/paytm/initiate', async (req, res) => {
         post_req.end();
 
     } catch (error) {
-        console.error("Internal Server Error:", error);
+        superLog("Internal Server Error:", error);
         res.status(500).json({ error: "Server error", message: error.message });
     }
 });
 
 // Callback URL Handler - Handles both POST (from Paytm) and GET (manual navigations)
 app.all('/paytm/callback', (req, res) => {
-    console.log("--- PAYTM CALLBACK RECEIVED ---");
-    console.log("Method:", req.method);
-    console.log("Body:", req.body);
-    console.log("Query:", req.query);
+    superLog("--- PAYTM CALLBACK RECEIVED ---");
+    superLog("Method:", req.method);
+    superLog("Body:", req.body);
+    superLog("Query:", req.query);
 
     // Determine the redirect base (the homepage of the redesign app)
     const redirectBase = process.env.BASE_URL || '../';
