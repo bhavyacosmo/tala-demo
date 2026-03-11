@@ -396,13 +396,13 @@ window.onclick = function (event) {
 registerForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const name = registerForm.querySelector('input[placeholder="Full Name *"]').value;
+  const name = registerForm.querySelector('input[placeholder="Name *"]').value;
   const phone = registerForm.querySelector('input[placeholder="Phone Number *"]').value;
   const officialEmail = registerForm.querySelector('input[placeholder="Official email *"]').value;
   const personalEmail = registerForm.querySelector('input[placeholder="Personal email *"]').value;
-  const school = registerForm.querySelector('input[placeholder="School / Organization *"]').value;
-  const city = registerForm.querySelector('input[placeholder="City *"]').value;
-  const subjects = registerForm.querySelector('textarea[placeholder="Subject(s) taught & Age group(s) taught *"]').value;
+  const school = registerForm.querySelector('input[placeholder="Name of school/organisation *"]').value;
+  const city = registerForm.querySelector('input[placeholder="What city are you coming from? *"]').value;
+  const subjects = registerForm.querySelector('textarea[placeholder="What subjects and age group do you teach?"]').value;
 
   const amount = currentOrderData.amount;
   const customerId = 'CUST_' + phone.replace(/\s+/g, '');
