@@ -140,7 +140,7 @@ h4,
 }
 
 .blue-theme .bento-inner {
-    border: 1px solid #E2E8F0;
+    border: none;
 }
 
 .blue-theme .section-tag {
@@ -184,7 +184,7 @@ h4,
 
 html {
     scroll-behavior: smooth;
-    overflow-x: hidden;
+    /* Removed overflow-x: hidden which blocks position: sticky */
 }
 
 body {
@@ -192,7 +192,7 @@ body {
     color: var(--dark);
     background: var(--white);
     line-height: 1.7;
-    overflow-x: hidden;
+    /* Removed overflow-x: hidden which blocks position: sticky */
 }
 
 img {
@@ -323,12 +323,12 @@ a {
 }
 
 .btn-primary {
-    background: var(--dark);
+    background: var(--tala-blue);
     color: var(--white);
 }
 
 .btn-primary:hover {
-    background: var(--tala-blue);
+    background: var(--tala-blue-dk);
     transform: translateY(-2px);
     box-shadow: var(--shadow-blue);
 }
@@ -742,7 +742,7 @@ RESPONSIVE
     background: #F0F7FF;
     position: relative;
     overflow: hidden;
-    padding: 10rem 0;
+    padding: 4rem 0;
 }
 
 .blob-3 {
@@ -891,8 +891,7 @@ RESPONSIVE
     background: #F0F9FF;
     /* Clean Light Blue */
     position: relative;
-    overflow: hidden;
-    padding: 10rem 0;
+    padding: 6rem 0 2rem; /* Greatly reduced bottom padding */
 }
 
 .decor-blob {
@@ -921,47 +920,48 @@ RESPONSIVE
 }
 
 .stacking-cards-container {
-    display: flex;
-    flex-direction: column;
-    gap: 4vh;
-    /* Dense professional sequence */
-    margin: 4rem auto 8rem;
-    perspective: 1200px;
+    display: block; /* Changed from flex to block for more reliable sticky behavior */
+    margin: 4rem auto 0;
+    padding-bottom: 40px; /* Reduced to remove the large gap after stacking */
     position: relative;
-    padding-bottom: 5vh;
+    max-width: 1200px;
 }
 
 .stacking-card {
     position: sticky;
     width: 100%;
-    min-height: 250px;
+    min-height: 200px;
+    margin-bottom: 60px; /* Reduced to keep cards compactly stacked */
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
-/* Staggered Asymmetric Alignment (Z-Pattern) */
+.stacking-card:last-child {
+    margin-bottom: 0;
+}
+
+/* Cards stack on each other as user scrolls — all land at the SAME top position */
+/* As you scroll down, card 2 slides up and covers card 1, card 3 covers card 2 */
 .stacking-card:nth-child(1) {
-    top: 80px;
-    z-index: 1;
-    justify-content: center;
+    top: 100px;
+    z-index: 10;
 }
 
 .stacking-card:nth-child(2) {
     top: 140px;
-    z-index: 2;
-    justify-content: center;
+    z-index: 20;
 }
 
 .stacking-card:nth-child(3) {
-    top: 200px;
-    z-index: 3;
-    justify-content: center;
+    top: 180px;
+    z-index: 30;
 }
 
 .card-pain-inner {
     background: var(--white);
     width: 100%;
-    max-width: 800px;
+    max-width: 1200px;
     /* Slightly narrower for staggering effect */
     padding: 3.5rem;
     border-radius: 35px;
@@ -976,11 +976,6 @@ RESPONSIVE
     transform-origin: center top;
 }
 
-/* Removing negative margin to allow stair visibility */
-.stacking-card:nth-child(2),
-.stacking-card:nth-child(3) {
-    margin-top: 0;
-}
 
 .stacking-card:hover .card-pain-inner {
     transform: translateY(-10px) scale(1.01);
@@ -1103,8 +1098,7 @@ RESPONSIVE
 /* Bento Grid — Full Width Immersive */
 .bento-grid {
     display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    grid-template-rows: auto auto;
+    grid-template-columns: repeat(3, 1fr);
     gap: 2.5rem;
     margin: 6rem 0;
 }
@@ -1116,16 +1110,15 @@ RESPONSIVE
     position: relative;
     overflow: hidden;
     box-shadow: 0 15px 50px rgba(0, 0, 0, 0.03);
-    border: 1px solid rgba(26, 115, 232, 0.05);
+    border: none;
     transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .bento-main {
-    grid-row: span 2;
-    background: linear-gradient(145deg, #ffffff 0%, #f7faff 100%);
+    background: var(--white); /* Match other items exactly */
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
 .bento-side,
@@ -1176,7 +1169,7 @@ RESPONSIVE
 }
 
 .bento-main h3 {
-    font-size: 2.75rem;
+    font-size: 2rem;
 }
 
 .bento-item p {
@@ -1271,7 +1264,7 @@ RESPONSIVE
 /* Workshop Intro Redesign */
 .workshop-intro-section {
     background: #0B0F19;
-    padding: 10rem 0;
+    padding: 4rem 0;
     position: relative;
     overflow: hidden;
 }
@@ -1408,7 +1401,7 @@ RESPONSIVE
 /* Registration Includes Redesign */
 .includes-section {
     background: #0F172A;
-    padding: 10rem 0;
+    padding: 4rem 0;
     position: relative;
     overflow: hidden;
 }
@@ -1507,7 +1500,7 @@ RESPONSIVE
 /* 3 Easy Steps Redesign */
 .steps-section {
     background: #F8FAFC;
-    padding: 10rem 0;
+    padding: 4.5rem 0;
 }
 
 .steps-row {
@@ -1528,8 +1521,8 @@ RESPONSIVE
     width: 84px;
     height: 84px;
     border-radius: 24px;
-    background: var(--dark-2);
-    color: var(--tala-cyan);
+    background: var(--tala-blue);
+    color: var(--white);
     font-family: var(--font-heading);
     font-size: 2.25rem;
     font-weight: 900;
@@ -1543,8 +1536,7 @@ RESPONSIVE
 
 .step-item:hover .step-circle {
     transform: scale(1.1) rotate(5deg);
-    background: var(--tala-blue);
-    color: var(--white);
+    background: var(--tala-blue-dk);
 }
 
 .step-line {
@@ -1580,7 +1572,7 @@ RESPONSIVE
 /* Sessions & Special Redesign */
 .special-section {
     background: var(--white);
-    padding: 10rem 0;
+    padding: 4rem 0;
 }
 
 .card-special {
@@ -1645,7 +1637,7 @@ RESPONSIVE
 
 .sessions-section {
     background: #F1F5F9;
-    padding: 10rem 0;
+    padding: 4rem 0;
 }
 
 .sessions-grid {
@@ -3025,8 +3017,7 @@ RESPONSIVE
 /* Facilitator Redesign */
 .facilitator-section {
     background: var(--dark);
-    padding: 6rem 0;
-    /* Reduced from 10rem */
+    padding: 3rem 0;
     color: var(--white);
     position: relative;
     overflow: hidden;
@@ -3035,8 +3026,7 @@ RESPONSIVE
 .facilitator-grid {
     display: grid;
     grid-template-columns: 1fr 1.2fr;
-    gap: 4rem;
-    /* Reduced from 8rem */
+    gap: 3rem;
     align-items: center;
 }
 
@@ -3091,16 +3081,16 @@ RESPONSIVE
 
 .facilitator-text h2 {
     color: var(--white);
-    font-size: 3.5rem;
-    margin-bottom: 2rem;
+    font-size: 3rem;
+    margin-bottom: 1.25rem;
     text-align: left;
 }
 
 .facilitator-bio p {
     color: rgba(255, 255, 255, 0.7);
-    font-size: 1.25rem;
-    line-height: 1.7;
-    margin-bottom: 2rem;
+    font-size: 1.15rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
 }
 
 .facilitator-bio strong {
@@ -3109,21 +3099,21 @@ RESPONSIVE
 
 .facilitator-quote {
     border-left: 4px solid var(--tala-blue);
-    padding: 2rem;
+    padding: 1.25rem 2rem;
     background: rgba(255, 255, 255, 0.03);
     border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
-    margin: 3rem 0;
+    margin: 1.5rem 0;
     font-style: italic;
     color: rgba(255, 255, 255, 0.9);
-    font-size: 1.2rem;
-    line-height: 1.8;
+    font-size: 1.1rem;
+    line-height: 1.6;
 }
 
 .facilitator-credits {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 3rem;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
 }
 
 .facilitator-credits span {
@@ -3136,12 +3126,41 @@ RESPONSIVE
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Further compact facilitator section for smaller viewport heights */
+@media (min-width: 1025px) and (max-height: 850px) {
+    .facilitator-section {
+        padding: 1.5rem 0;
+    }
+    .facilitator-text h2 {
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
+    }
+    .facilitator-bio p {
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+        line-height: 1.5;
+    }
+    .facilitator-quote {
+        padding: 1rem 1.5rem;
+        margin: 1rem 0;
+        font-size: 1rem;
+    }
+    .facilitator-credits {
+        margin-bottom: 1.5rem;
+        gap: 0.5rem;
+    }
+    .facilitator-credits span {
+        padding: 0.35rem 1rem;
+        font-size: 0.85rem;
+    }
+}
+
 /* ============================================================
    FAQ (PREMIUM GRID OVERHAUL)
    ============================================================ */
 .faq-section {
     background: #F8FAFC;
-    padding: 12rem 0;
+    padding: 4.5rem 0;
     position: relative;
     overflow: hidden;
 }
@@ -3285,7 +3304,7 @@ RESPONSIVE
 }
 
 .marquee-container {
-    margin-top: 4rem;
+    margin-top: 2rem;
     overflow: hidden;
     white-space: nowrap;
     position: relative;
@@ -3296,7 +3315,7 @@ RESPONSIVE
     display: inline-flex;
     gap: 2rem;
     animation: marquee 40s linear infinite;
-    padding: 2rem 0;
+    padding: 1rem 0;
 }
 
 .marquee-content:hover {
@@ -3316,7 +3335,7 @@ RESPONSIVE
 .session-card {
     flex: 0 0 350px;
     background: var(--white);
-    padding: 3rem;
+    padding: 2rem;
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-soft);
     display: flex;
@@ -3365,38 +3384,38 @@ RESPONSIVE
    ============================================================ */
 .workshop-full-section {
     background: #0B0F19;
-    /* Deep professional dark */
     color: var(--white);
-    padding: 10rem 0;
+    padding: 3rem 0;
     position: relative;
     overflow: hidden;
+    min-height: auto;
+    display: flex;
+    align-items: center;
 }
 
 .workshop-main-layout {
     display: grid;
     grid-template-columns: 1.3fr 1fr;
-    /* Stronger asymmetry */
-    gap: 10rem;
-    /* Bolder breathing space */
+    gap: 5rem;
     align-items: center;
 }
 
 .workshop-text-side .section-title {
     color: var(--white);
-    font-size: 4rem;
+    font-size: 2.8rem;
     line-height: 1;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     letter-spacing: -0.04em;
 }
 
 .workshop-impact-stats {
     display: flex;
     align-items: center;
-    gap: 4rem;
-    margin: 4.5rem 0;
-    padding: 3rem;
+    gap: 2.5rem;
+    margin: 2rem 0;
+    padding: 1.5rem 2rem;
     background: rgba(255, 255, 255, 0.03);
-    border-radius: 40px;
+    border-radius: 24px;
     border: 1px solid rgba(255, 255, 255, 0.06);
     width: fit-content;
 }
@@ -3407,11 +3426,11 @@ RESPONSIVE
 }
 
 .stat-num {
-    font-size: 3.5rem;
+    font-size: 2.2rem;
     font-weight: 900;
     color: var(--tala-cyan);
     line-height: 1;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
 }
 
 .stat-label {
@@ -3432,17 +3451,18 @@ RESPONSIVE
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 3rem;
+    gap: 1rem;
 }
 
 .premium-features-list li {
     display: flex;
-    gap: 2rem;
-    padding: 2.5rem;
+    gap: 1.25rem;
+    padding: 1.25rem 1.5rem;
     background: rgba(255, 255, 255, 0.02);
-    border-radius: 35px;
+    border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.04);
     transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    align-items: center;
 }
 
 .premium-features-list li:hover {
@@ -3454,45 +3474,45 @@ RESPONSIVE
 
 .premium-features-list .feat-icon {
     flex-shrink: 0;
-    width: 64px;
-    height: 64px;
+    width: 44px;
+    height: 44px;
     background: rgba(0, 242, 255, 0.1);
     color: var(--tala-cyan);
-    border-radius: 22px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .feat-text h4 {
-    font-size: 1.5rem;
+    font-size: 1.1rem;
     font-weight: 800;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.3rem;
     color: var(--white);
     letter-spacing: -0.01em;
 }
 
 .feat-text p {
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     color: rgba(255, 255, 255, 0.5);
-    line-height: 1.6;
+    line-height: 1.5;
 }
 
 /* ============================================================
    FAQ REDESIGN — PROFESSIONAL & FULL-WIDTH
    ============================================================ */
 .faq-section {
-    padding: 10rem 0;
+    padding: 5rem 0;
     background: #fdfdfd;
 }
 
 .faq-container {
     max-width: 1400px;
-    margin: 5rem auto 0;
+    margin: 3rem auto 0;
     display: grid;
     grid-template-columns: 1.1fr 0.9fr;
     /* Asymmetric balance */
-    gap: 3rem;
+    gap: 2rem;
 }
 
 .faq-item {
@@ -4386,20 +4406,19 @@ RESPONSIVE
 }
 
 .testimonials-grid {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    justify-content: center !important;
+    display: grid !important;
+    grid-template-columns: repeat(6, 1fr) !important;
     gap: 3rem !important;
     margin-top: 5rem !important;
-    max-width: 1400px !important;
+    max-width: 1500px !important;
     margin-left: auto !important;
     margin-right: auto !important;
 }
 
 .testimonial-card {
-    flex: 0 1 calc(33.333% - 2.8rem) !important;
+    grid-column: span 2 !important;
     background: #FFFFFF !important;
-    padding: 3.5rem !important;
+    padding: 3rem 3.5rem !important;
     border-radius: 40px !important;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03) !important;
     border: 1px solid rgba(26, 115, 232, 0.1) !important;
@@ -4407,8 +4426,25 @@ RESPONSIVE
     flex-direction: column !important;
     transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
     position: relative !important;
-    min-width: 300px !important;
-    /* Reduced to prevent early wrap */
+    width: 100% !important;
+}
+
+/* Force 3 on top row */
+.testimonial-card:nth-child(1),
+.testimonial-card:nth-child(2),
+.testimonial-card:nth-child(3) {
+    grid-row: 1 !important;
+}
+
+/* Force 2 on second row and center them */
+.testimonial-card:nth-child(4) {
+    grid-row: 2 !important;
+    grid-column: 2 / 4 !important;
+}
+
+.testimonial-card:nth-child(5) {
+    grid-row: 2 !important;
+    grid-column: 4 / 6 !important;
 }
 
 .testimonial-card:hover {
@@ -4455,14 +4491,16 @@ RESPONSIVE
     font-size: 1.3rem !important;
     border: 2px solid #FFFFFF !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+    flex-shrink: 0 !important;
 }
 
 .testimonial-author strong {
     display: block !important;
-    font-size: 1.3rem !important;
+    font-size: 1.3rem !important; 
     color: var(--dark) !important;
     font-family: var(--font-heading) !important;
     letter-spacing: -0.01em !important;
+    white-space: nowrap !important; /* Force name to single line */
 }
 
 .testimonial-author span {
@@ -4470,6 +4508,7 @@ RESPONSIVE
     color: #64748B !important;
     display: block !important;
     margin-top: 0.2rem !important;
+    white-space: nowrap !important; /* Force role to single line */
 }
 
 @media (max-width: 1200px) {
@@ -4477,6 +4516,11 @@ RESPONSIVE
         grid-template-columns: repeat(2, 1fr) !important;
         grid-gap: 2.5rem !important;
         padding: 0 2rem !important;
+    }
+    
+    .testimonial-card {
+        grid-column: auto !important;
+        grid-row: auto !important;
     }
 }
 
@@ -4488,6 +4532,8 @@ RESPONSIVE
 
     .testimonial-card {
         padding: 3rem 2rem !important;
+        grid-column: auto !important;
+        grid-row: auto !important;
     }
 
     .testimonials-section {
