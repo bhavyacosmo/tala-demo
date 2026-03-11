@@ -7,14 +7,6 @@ const PaytmChecksum = require('paytmchecksum');
 const path = require('path');
 
 const PID = Math.floor(Math.random() * 9000) + 1000;
-const logStream = fs.createWriteStream(path.join(__dirname, 'server_debug.log'), { flags: 'a' });
-
-function superLog(msg) {
-    const timestamp = new Date().toLocaleTimeString();
-    console.log(`[${timestamp}] ${msg}`);
-}
-
-superLog("--- SERVER STARTING ---");
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -23,12 +15,6 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files from the current directory
 app.use(express.static(__dirname));
 
-// --- GLOBAL REQUEST LOGGING (DEBUG) ---
-app.use((req, res, next) => {
-    superLog(`🔍 Incoming: ${req.method} ${req.url}`);
-    next();
-});
-
 const PORT = process.env.PORT || 3000;
 
 // Paytm Configuration
@@ -36,7 +22,7 @@ const PAYTM_MID = process.env.PAYTM_MID || "NvwNCG76079722724032";
 const PAYTM_MERCHANT_KEY = process.env.PAYTM_MERCHANT_KEY || "x#Fi@Q7FecmG%3eP";
 const PAYTM_WEBSITE = process.env.PAYTM_WEBSITE || "WEBSTAGING";
 
-superLog("Google Webhook: " + (process.env.GOOGLE_SHEET_WEBHOOK_URL ? "CONFIGURED" : "MISSING"));
+console.log("Google Webhook: " + (process.env.GOOGLE_SHEET_WEBHOOK_URL ? "CONFIGURED" : "MISSING"));
 
 // For Staging
 const PAYTM_ENV = 'securestage.paytmpayments.com';
