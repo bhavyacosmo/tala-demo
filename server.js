@@ -29,6 +29,40 @@ const PAYTM_ENV = 'securestage.paytmpayments.com';
 // For Production
 // const PAYTM_ENV = 'secure.paytmpayments.com';
 
+/**
+ * Helper to send data to Google Sheet Webhook
+ */
+async function sendToGoogleSheet(payload) {
+    const webhookUrl = process.env.GOOGLE_SHEET_WEBHOOK_URL;
+    if (!webhookUrl) {
+        console.log("⚠️ Google Sheet Webhook URL not set. Skipping log.");
+        return;
+    }
+
+    try {
+        const url = new URL(webhookUrl);
+        const options = {
+            hostname: url.hostname,
+            path: url.pathname + url.search,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
+        const post_req = https.request(options, (res) => {
+            res.on('data', () => { }); // Consume data
+        });
+
+        post_req.on('error', (e) => console.error("Google Sheet error:", e));
+        post_req.write(JSON.stringify(payload));
+        post_req.end();
+        console.log("➡️ Data signaled to Google Sheet:", payload.action);
+    } catch (err) {
+        console.error("Failed to signal Google Sheet:", err.message);
+    }
+}
+
 app.post('/paytm/initiate', async (req, res) => {
     try {
         const { amount, customerId, customerEmail, customerPhone } = req.body;
@@ -116,6 +150,20 @@ app.post('/paytm/initiate', async (req, res) => {
                             mid: PAYTM_MID,
                             environment: PAYTM_ENV
                         });
+
+                        // --- LOG TO GOOGLE SHEET (NEW LEAD) ---
+                        sendToGoogleSheet({
+                            action: "APPEND",
+                            orderId: orderId,
+                            name: req.body.customerName || "Unknown",
+                            phone: customerPhone,
+                            email: customerEmail,
+                            officialEmail: req.body.officialEmail || "",
+                            school: req.body.school || "",
+                            city: req.body.city || "",
+                            subjects: req.body.subjects || "",
+                            amount: amount
+                        });
                     } else {
                         console.error("Paytm Initiation Failed:", result);
                         res.status(500).json({ error: "Failed to generate txnToken", details: result });
@@ -158,16 +206,36 @@ app.all('/paytm/callback', (req, res) => {
         return res.redirect(`${redirectBase}?status=cancelled`);
     }
 
-    const { STATUS, ORDERID, RESPMSG } = req.body;
+    const { STATUS, ORDERID, RESPMSG, TXNID } = req.body;
 
     if (STATUS === 'TXN_SUCCESS') {
         const finalUrl = `${redirectBase}?status=success&orderId=${ORDERID}`;
         console.log("Redirecting to:", finalUrl);
+
+        // --- UPDATE GOOGLE SHEET (SUCCESS) ---
+        sendToGoogleSheet({
+            action: "UPDATE",
+            orderId: ORDERID,
+            status: "SUCCESS",
+            txnId: TXNID
+        });
+
         res.redirect(finalUrl);
     } else {
         console.log("Transaction Failed/Cancelled:", RESPMSG);
         const finalUrl = `${redirectBase}?status=failed&orderId=${ORDERID || 'unknown'}&msg=${encodeURIComponent(RESPMSG || '')}`;
         console.log("Redirecting to:", finalUrl);
+
+        // --- UPDATE GOOGLE SHEET (FAILED/CANCEL) ---
+        if (ORDERID) {
+            sendToGoogleSheet({
+                action: "UPDATE",
+                orderId: ORDERID,
+                status: STATUS === 'TXN_FAILURE' ? "FAILED" : "CANCELLED",
+                txnId: TXNID || ""
+            });
+        }
+
         res.redirect(finalUrl);
     }
 });

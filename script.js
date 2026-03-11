@@ -396,9 +396,13 @@ window.onclick = function (event) {
 registerForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const name = registerForm.querySelector('input[placeholder="Name *"]').value;
+  const name = registerForm.querySelector('input[placeholder="Full Name *"]').value;
   const phone = registerForm.querySelector('input[placeholder="Phone Number *"]').value;
-  const email = registerForm.querySelector('input[placeholder="Official email *"]').value;
+  const officialEmail = registerForm.querySelector('input[placeholder="Official email *"]').value;
+  const personalEmail = registerForm.querySelector('input[placeholder="Personal email *"]').value;
+  const school = registerForm.querySelector('input[placeholder="School / Organization *"]').value;
+  const city = registerForm.querySelector('input[placeholder="City *"]').value;
+  const subjects = registerForm.querySelector('textarea[placeholder="Subject(s) taught & Age group(s) taught *"]').value;
 
   const amount = currentOrderData.amount;
   const customerId = 'CUST_' + phone.replace(/\s+/g, '');
@@ -418,8 +422,13 @@ registerForm.addEventListener('submit', async (e) => {
       body: JSON.stringify({
         amount: amount,
         customerId: customerId,
-        customerEmail: email,
-        customerPhone: phone
+        customerEmail: personalEmail,
+        customerPhone: phone,
+        customerName: name,
+        officialEmail: officialEmail,
+        school: school,
+        city: city,
+        subjects: subjects
       })
     });
 
