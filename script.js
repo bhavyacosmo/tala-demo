@@ -369,13 +369,21 @@ payButtons.forEach(button => {
     } else if (card.id.includes('group')) {
       const p = card.id.startsWith('m-') ? 'm' : 'd';
       const cityFull = window.gState[p].city;
+      const cityShort = cityFull === 'Bangalore' ? 'blr' : 'pun';
       const acc = window.gState[p].acc;
-      const gq = window.gState[p].qty;
       const data = GROUP_PRICES[cityFull][acc];
 
-      if (gq <= 4) currentOrderData.amount = data['up-to-4'] * gq;
-      else if (gq === 5) currentOrderData.amount = data['5-teachers'] * 5;
-      else currentOrderData.amount = data['6-plus'] * gq;
+      // Find which tier is selected
+      const selectedTier = document.querySelector(`input[name="${p}-g-tier-${cityShort}"]:checked`).value;
+
+      if (selectedTier === "4") {
+        currentOrderData.amount = data['up-to-4'] * 4;
+      } else if (selectedTier === "5") {
+        currentOrderData.amount = data['5-teachers'] * 5;
+      } else if (selectedTier === "6") {
+        const gq = window.gState[p].qty;
+        currentOrderData.amount = data['6-plus'] * gq;
+      }
     }
 
     window.openRegisterModal();
