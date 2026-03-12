@@ -184,7 +184,7 @@ h4,
 
 html {
     scroll-behavior: smooth;
-    /* Removed overflow-x: hidden which blocks position: sticky */
+    /* overflow-x MUST remain visible for position: sticky to work */
 }
 
 body {
@@ -192,7 +192,7 @@ body {
     color: var(--dark);
     background: var(--white);
     line-height: 1.7;
-    /* Removed overflow-x: hidden which blocks position: sticky */
+    /* overflow-x MUST remain visible for position: sticky to work */
 }
 
 img {
@@ -922,7 +922,7 @@ RESPONSIVE
 .stacking-cards-container {
     display: block; /* Changed from flex to block for more reliable sticky behavior */
     margin: 4rem auto 0;
-    padding-bottom: 40px; /* Reduced to remove the large gap after stacking */
+    padding-bottom: 150px; /* Restored runway for sticky animation to finish securely */
     position: relative;
     max-width: 1200px;
 }
@@ -931,7 +931,7 @@ RESPONSIVE
     position: sticky;
     width: 100%;
     min-height: 200px;
-    margin-bottom: 60px; /* Reduced to keep cards compactly stacked */
+    margin-bottom: 150px; /* Restored balance to allow cards to stack during scroll rather than snap instantly */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2890,9 +2890,7 @@ RESPONSIVE
         display: block !important;
     }
 
-    body {
-        padding: 30px 16px;
-    }
+    /* body padding removed to fix white borders on mobile */
 
     /* Refined header wrapping for Image 2 */
     .section-header p {
@@ -2953,9 +2951,7 @@ RESPONSIVE
 
 /* ── SMALL MOBILE (< 480px) ── */
 @media (max-width: 480px) {
-    body {
-        padding: 24px 12px;
-    }
+    /* body padding removed to fix white borders on small mobile */
 
     .card {
         padding: 22px 16px 74px;
@@ -4500,7 +4496,7 @@ RESPONSIVE
     color: var(--dark) !important;
     font-family: var(--font-heading) !important;
     letter-spacing: -0.01em !important;
-    white-space: nowrap !important; /* Force name to single line */
+    white-space: nowrap !important; /* Force name to single line on desktop */
 }
 
 .testimonial-author span {
@@ -4508,7 +4504,7 @@ RESPONSIVE
     color: #64748B !important;
     display: block !important;
     margin-top: 0.2rem !important;
-    white-space: nowrap !important; /* Force role to single line */
+    white-space: nowrap !important; /* Force role to single line on desktop */
 }
 
 @media (max-width: 1200px) {
@@ -4526,11 +4522,19 @@ RESPONSIVE
 
 @media (max-width: 768px) {
     .testimonials-grid {
-        grid-template-columns: 1fr !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 2.5rem !important;
         padding: 0 1.5rem !important;
     }
 
-    .testimonial-card {
+    .testimonial-card,
+    .testimonial-card:nth-child(1),
+    .testimonial-card:nth-child(2),
+    .testimonial-card:nth-child(3),
+    .testimonial-card:nth-child(4),
+    .testimonial-card:nth-child(5) {
         padding: 3rem 2rem !important;
         grid-column: auto !important;
         grid-row: auto !important;
@@ -4538,5 +4542,10 @@ RESPONSIVE
 
     .testimonials-section {
         padding: 8rem 0 !important;
+    }
+    
+    .testimonial-author strong,
+    .testimonial-author span {
+        white-space: normal !important; /* ONLY allow names and roles to wrap on mobile */
     }
 }
