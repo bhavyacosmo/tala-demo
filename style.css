@@ -4086,19 +4086,35 @@ RESPONSIVE
         padding: 12px 20px;
     }
 
-    /* Hero Fix (Image 3) */
+    /* Hero Fix (Refined for extreme mobile) */
     .hero-title {
-        font-size: 2.25rem !important;
-        line-height: 1.2;
+        font-size: 1.85rem !important; /* Reduced for better wrapping */
+        line-height: 1.25;
         width: 100% !important;
         max-width: 100% !important;
+        margin-bottom: 1.5rem !important;
     }
 
     .hero-content {
-        padding: 8rem 1rem !important;
+        padding: 6rem 1.25rem 4rem !important; /* Adjusted padding */
         text-align: center !important;
         margin-left: 0 !important;
         width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .hero-subtitle {
+        font-size: 1.1rem !important;
+        padding: 0 0.5rem !important;
+        margin-bottom: 2rem !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .hero-features {
+        align-items: center !important;
+        width: 100% !important;
+        padding: 0 1rem !important;
         box-sizing: border-box !important;
     }
 
