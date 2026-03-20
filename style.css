@@ -217,13 +217,16 @@ a {
 }
 
 /* Ultra-Premium Typography */
+/* Global Mobile Adjustments */
 @media (max-width: 768px) {
     .container {
-        padding: 0 1.25rem;
+        padding: 0 1rem !important;
+        width: 100% !important;
     }
 
     .section-title {
-        font-size: clamp(2rem, 8vw, 2.75rem);
+        font-size: clamp(1.75rem, 7vw, 2.25rem) !important;
+        line-height: 1.2 !important;
     }
 }
 
@@ -3976,17 +3979,17 @@ RESPONSIVE
 
 @media (max-width: 768px) {
     .section {
-        padding: 5rem 0;
+        padding: 4rem 0 !important;
     }
 
     .section-title {
-        font-size: 2.25rem !important;
-        padding: 0 1rem;
+        font-size: clamp(1.75rem, 8vw, 2.25rem) !important;
+        padding: 0 0.5rem;
     }
 
     .section-subtitle {
         font-size: 1rem;
-        padding: 0 1.5rem;
+        padding: 0 1rem;
         margin-bottom: 2rem;
     }
 
