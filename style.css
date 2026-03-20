@@ -4,6 +4,20 @@
    ============================================================ */
 
 /* ---- RESET & BASE ---- */
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-body);
+    color: var(--dark);
+    background: var(--white);
+    line-height: 1.7;
+}
+
 *,
 *::before,
 *::after {
@@ -4025,8 +4039,7 @@ RESPONSIVE
         position: fixed;
         top: 0;
         right: 0;
-        width: 75%;
-        max-width: 280px;
+        width: 100%;
         height: 100vh;
         background: var(--white);
         flex-direction: column;
@@ -4035,22 +4048,25 @@ RESPONSIVE
         box-shadow: -5px 0 25px rgba(0,0,0,0.15);
         z-index: 1000;
         display: flex !important;
-        transform: translateX(105%); /* Start fully off-screen */
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateX(100%); /* Start fully off-screen */
+        visibility: hidden; /* Prevent extra space/scrolling */
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s;
         overflow-y: auto;
         text-align: left;
     }
 
     .nav-links.active {
         transform: translateX(0) !important;
+        visibility: visible !important;
     }
 
     .nav-links a {
-        width: 100%;
+        width: 100% !important;
         padding: 1.25rem 0;
         border-bottom: 1px solid rgba(0,0,0,0.05);
         text-align: left !important;
-        display: block;
+        display: block !important;
+        box-sizing: border-box !important;
     }
 
     .nav-item {
@@ -4084,9 +4100,13 @@ RESPONSIVE
     }
 
     .nav-cta {
-        width: 100%;
+        width: 100% !important;
+        max-width: 100% !important; /* Ensure it doesn't overflow */
         text-align: center;
-        padding: 12px 20px;
+        padding: 14px 20px;
+        box-sizing: border-box !important;
+        display: inline-block;
+        margin-top: 1rem;
     }
 
     /* Hero Fix (Refined for extreme mobile) */
