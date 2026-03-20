@@ -193,7 +193,7 @@ body {
     color: var(--dark);
     background: var(--white);
     line-height: 1.7;
-    /* overflow-x MUST remain visible for position: sticky to work */
+    overflow-x: hidden; /* Prevent horizontal scroll from hidden mobile menu */
 }
 
 img {
@@ -4021,30 +4021,33 @@ RESPONSIVE
     .nav-links {
         position: fixed;
         top: 0;
-        right: -100%;
-        width: 85%;
-        max-width: 320px;
+        right: 0;
+        width: 75%;
+        max-width: 280px;
         height: 100vh;
         background: var(--white);
         flex-direction: column;
-        justify-content: flex-start; /* Start from top */
-        gap: 0; /* Remove gap, use padding/margin on items */
-        padding: 5rem 1.5rem 2rem; /* Top padding to clear header logo */
-        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+        justify-content: flex-start;
+        padding: 5rem 1.5rem 2rem;
+        box-shadow: -5px 0 25px rgba(0,0,0,0.15);
         z-index: 1000;
         display: flex !important;
-        transition: right 0.3s ease;
-        overflow-y: auto; /* Allow scrolling if menu is long */
+        transform: translateX(105%); /* Start fully off-screen */
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow-y: auto;
+        text-align: left;
     }
 
     .nav-links.active {
-        right: 0 !important;
+        transform: translateX(0) !important;
     }
 
     .nav-links a {
         width: 100%;
-        padding: 1rem 0;
+        padding: 1.25rem 0;
         border-bottom: 1px solid rgba(0,0,0,0.05);
+        text-align: left !important;
+        display: block;
     }
 
     .nav-item {
