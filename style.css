@@ -31,8 +31,9 @@
     --pain-border: #E2E8F0;
     --solution-bg: #F8FAFC;
 
-    --font-heading: 'Fraunces', serif;
-    --font-body: 'Plus Jakarta Sans', sans-serif;
+    --font-heading: 'Poppins', sans-serif;
+    --font-body: 'Poppins', sans-serif;
+    --font-display: 'Poppins', sans-serif;
 
     --radius-sm: 8px;
     --radius-md: 12px;
